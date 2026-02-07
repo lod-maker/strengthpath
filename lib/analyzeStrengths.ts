@@ -159,8 +159,8 @@ export async function analyzeStrengths(
   const model = genAI.getGenerativeModel({
     model: "gemini-3-pro-preview",
     generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 8192,
+      temperature: 1,
+      maxOutputTokens: 40000,
       responseMimeType: "application/json",
     },
   });
