@@ -84,7 +84,7 @@ export default function AnalyzePage() {
               <img src="/accenture-logo.png" alt="Accenture" className="w-8 h-8 rounded-lg object-cover" />
               <div className="flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-white">StrengthPath</span>
-                <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG)</span>
+                <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG) — Internal team tool</span>
               </div>
             </div>
           </Link>

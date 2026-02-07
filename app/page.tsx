@@ -28,7 +28,7 @@ export default function LandingPage() {
           <img src="/accenture-logo.png" alt="Accenture" className="w-9 h-9 rounded-xl object-cover" />
           <div className="flex flex-col leading-tight">
             <span className="text-base font-bold text-white">StrengthPath</span>
-            <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG)</span>
+            <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG) — Internal team tool</span>
           </div>
         </div>
         <Link href="/analyze">
