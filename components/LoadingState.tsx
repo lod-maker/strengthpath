@@ -15,19 +15,19 @@ const PHASES: {
     id: "extracting",
     label: "Extracting strengths from your PDF...",
     icon: <FileSearch className="w-5 h-5" />,
-    duration: 3000,
+    duration: 4000,
   },
   {
     id: "analyzing",
     label: "Matching against 27 Accenture roles...",
     icon: <Brain className="w-5 h-5" />,
-    duration: 8000,
+    duration: 12000,
   },
   {
     id: "generating",
     label: "Ranking roles and generating insights...",
     icon: <Sparkles className="w-5 h-5" />,
-    duration: 5000,
+    duration: 10000,
   },
 ];
 
