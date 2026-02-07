@@ -54,7 +54,7 @@ export default function FeedbackCard({ topRole, trackTitle }: FeedbackCardProps)
           Thanks for the feedback!
         </h3>
         <p className="text-sm text-gray-400">
-          This helps us improve TAG for the whole team.
+          This helps us improve StrengthPath for the whole team.
         </p>
       </motion.div>
     );

@@ -83,8 +83,8 @@ export default function AnalyzePage() {
             <div className="flex items-center gap-2">
               <img src="/accenture-logo.png" alt="Accenture" className="w-8 h-8 rounded-lg object-cover" />
               <div className="flex flex-col leading-tight">
-                <span className="text-sm font-semibold text-white">TAG</span>
-                <span className="text-[10px] text-gray-400 tracking-wide">Technology Analyst Guide</span>
+                <span className="text-sm font-semibold text-white">StrengthPath</span>
+                <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG)</span>
               </div>
             </div>
           </Link>

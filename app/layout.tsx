@@ -15,9 +15,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "TAG — Accenture Technology Analyst Guide",
+  title: "StrengthPath — Map Your Gallup Strengths to Accenture Roles",
   description:
-    "Discover how your CliftonStrengths align with Accenture Newcastle analyst career tracks. Upload your Gallup report and get AI-powered insights.",
+    "Discover how your CliftonStrengths align with Accenture Technology Analyst (TAG) career tracks. Upload your Gallup report and get AI-powered insights.",
 };
 
 export default function RootLayout({
