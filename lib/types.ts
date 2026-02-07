@@ -52,6 +52,7 @@ export type RoleMatch = {
   fitScore: number;
   fitTier: FitTier;
   withinCurrentTrack: boolean;
+  matchReason: string;
   strengthAlignments: StrengthAlignment[];
   dayInTheLife: string;
   growthTip: string;

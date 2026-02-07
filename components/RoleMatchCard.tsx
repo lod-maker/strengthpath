@@ -113,6 +113,13 @@ export default function RoleMatchCard({ match, index }: RoleMatchCardProps) {
               className={"h-full rounded-full " + getFitColor(match.fitTier)}
             />
           </div>
+
+          {/* Match reason — always visible as preview */}
+          {match.matchReason && (
+            <p className="mt-2.5 text-sm text-gray-400 leading-relaxed line-clamp-2">
+              {match.matchReason}
+            </p>
+          )}
         </div>
       </button>
 

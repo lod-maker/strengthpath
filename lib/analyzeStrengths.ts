@@ -91,6 +91,11 @@ Note: People CAN move between tracks over time, so also flag strong fits outside
 Return the TOP 5 role matches within their track plus the TOP 3 role matches outside their track.
 For each top role match, include 2-4 specific strength alignments with concrete explanations.
 
+IMPORTANT GUIDELINES:
+- "matchReason": A single punchy sentence (max 20 words) explaining WHY this person fits this role, referencing their specific top strengths by name. This is shown as a preview before the user expands details. Example: "Your Strategic and Analytical strengths make you a natural at the high-level decision-making this role demands."
+- "dayInTheLife": Write this as a PERSONALISED strength-based narrative, NOT a generic job description. Describe how THIS person's specific strengths would show up during a typical day. Example: Instead of "You will attend meetings and write documents", write "Your Achiever drive powers you through back-to-back client workshops, while your Deliberative nature ensures every requirement is bulletproof before sign-off."
+- "growthTip": Make this actionable and specific to the person's strength profile.
+
 Respond ONLY in valid JSON. No markdown, no backticks, no preamble.
 
 {
@@ -109,13 +114,14 @@ Respond ONLY in valid JSON. No markdown, no backticks, no preamble.
       "fitScore": 92,
       "fitTier": "Exceptional Fit",
       "withinCurrentTrack": true,
+      "matchReason": "Your Strategic and Communication strengths are the exact combination that makes a BA thrive in client-facing analysis.",
       "strengthAlignments": [
         {
           "strength": "Strategic",
           "relevance": "Your Strategic strength directly maps to the BA's core task of translating complex business problems into structured requirements. You'll naturally see patterns in client needs that others miss."
         }
       ],
-      "dayInTheLife": "You'd spend your mornings in client workshops capturing requirements, afternoons translating those into user stories and process maps, and regularly presenting findings to both the client and your delivery team.",
+      "dayInTheLife": "Your mornings start in client workshops where your Communication strength shines — drawing out requirements others miss. Afternoons, your Strategic thinking kicks in as you translate messy conversations into crisp user stories and process maps. Your Analytical side ensures every edge case is covered before you present to the delivery team.",
       "growthTip": "Pair your Strategic thinking with formal BA frameworks like MoSCoW prioritisation and BPMN process modelling to add structure to your natural instincts."
     }
   ],
