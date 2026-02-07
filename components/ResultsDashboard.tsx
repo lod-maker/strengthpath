@@ -10,6 +10,7 @@ import GrowthAreas from "./GrowthAreas";
 import TeamInsights from "./TeamInsights";
 import { AnalysisResult, TrackId } from "@/lib/types";
 import { TRACKS } from "@/lib/accentureRoles";
+import FeedbackCard from "./FeedbackCard";
 import {
   Download,
   RefreshCw,
@@ -198,11 +199,17 @@ export default function ResultsDashboard({
         </motion.section>
       </div>
 
+      {/* ─── Feedback ─── */}
+      <FeedbackCard
+        topRole={topMatch ? topMatch.role : "N/A"}
+        trackTitle={track.title}
+      />
+
       {/* ─── Bottom Actions ─── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.6 }}
+        transition={{ duration: 0.4, delay: 0.7 }}
         className="flex flex-col sm:flex-row justify-center gap-4 pt-8 border-t border-border"
       >
         <Button variant="outline" onClick={onReset}>
