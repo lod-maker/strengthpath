@@ -27,8 +27,8 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           <img src="/accenture-logo.png" alt="Accenture" className="w-9 h-9 rounded-xl object-cover" />
           <div className="flex flex-col leading-tight">
-            <span className="text-base font-bold text-white">StrengthPath</span>
-            <span className="text-[10px] text-gray-400 tracking-wide">Accenture Newcastle Technology</span>
+            <span className="text-base font-bold text-white">TAG</span>
+            <span className="text-[10px] text-gray-400 tracking-wide">Technology Analyst Guide</span>
           </div>
         </div>
         <Link href="/analyze">

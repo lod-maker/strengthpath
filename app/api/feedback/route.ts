@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Log feedback server-side (visible in Vercel function logs)
-    console.log("=== STRENGTHPATH FEEDBACK ===");
+    console.log("=== TAG FEEDBACK ===");
     console.log(JSON.stringify({
       reaction: body.reaction,
       comment: body.comment,

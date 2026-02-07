@@ -66,7 +66,7 @@ export default function ResultsDashboard({
         heightLeft -= pdf.internal.pageSize.getHeight();
       }
 
-      pdf.save("StrengthPath-Report.pdf");
+      pdf.save("TAG-Report.pdf");
     } catch (err) {
       console.error("PDF download failed:", err);
     }
