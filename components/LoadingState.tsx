@@ -33,6 +33,7 @@ const PHASES: {
 
 export default function LoadingState() {
   const [currentPhase, setCurrentPhase] = useState(0);
+  const [allPhasesComplete, setAllPhasesComplete] = useState(false);
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
@@ -48,6 +49,14 @@ export default function LoadingState() {
         );
       }
     });
+
+    // After all phases finish, mark as complete
+    const totalDuration = PHASES.reduce((sum, p) => sum + p.duration, 0);
+    timers.push(
+      setTimeout(() => {
+        setAllPhasesComplete(true);
+      }, totalDuration)
+    );
 
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -69,8 +78,8 @@ export default function LoadingState() {
       {/* Phase steps */}
       <div className="w-full max-w-md space-y-4">
         {PHASES.map((phase, index) => {
-          const isActive = index === currentPhase;
-          const isComplete = index < currentPhase;
+          const isActive = !allPhasesComplete && index === currentPhase;
+          const isComplete = allPhasesComplete || index < currentPhase;
 
           return (
             <motion.div
@@ -132,6 +141,23 @@ export default function LoadingState() {
             </motion.div>
           );
         })}
+
+        {/* Finalizing message — shows after all phases complete while still waiting */}
+        {allPhasesComplete && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-3 pt-4"
+          >
+            <motion.div
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="text-sm text-accent font-medium"
+            >
+              Finalizing your results — almost there...
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
