@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
           : "AI analysis failed. Please try again.";
 
       // Check for rate limiting
-      if (message.includes("rate") || message.includes("429")) {
+      if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED")) {
         return NextResponse.json(
           {
             error:
