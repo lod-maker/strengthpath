@@ -31,11 +31,18 @@ export default function LandingPage() {
             <span className="text-[10px] text-gray-400 tracking-wide">Accenture Technology Analyst (TAG) — Internal team tool</span>
           </div>
         </div>
-        <Link href="/analyze">
-          <Button variant="outline" size="sm">
-            Get Started
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/team">
+            <Button variant="ghost" size="sm">
+              Team Map
+            </Button>
+          </Link>
+          <Link href="/analyze">
+            <Button variant="outline" size="sm">
+              Get Started
+            </Button>
+          </Link>
+        </div>
       </header>
 
       {/* Hero */}

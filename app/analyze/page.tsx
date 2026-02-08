@@ -193,6 +193,13 @@ export default function AnalyzePage() {
               );
             })}
           </div>
+
+          {/* Team Map link */}
+          <Link href="/team" className="hidden sm:block">
+            <Button variant="ghost" size="sm">
+              Team Map
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -327,6 +334,7 @@ export default function AnalyzePage() {
                 analysis={analysis}
                 trackId={selectedTrack}
                 userName={userName}
+                strengths={strengths || []}
                 personaImageUrl={personaImageUrl}
                 isGeneratingImage={isGeneratingImage}
                 onReset={handleReset}

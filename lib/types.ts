@@ -139,3 +139,20 @@ export type LoadingPhase =
   | "extracting"
   | "analyzing"
   | "generating";
+
+// ─── Team Builder Types ──────────────────────────────────────────────────────
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  track: string;
+  topFive: string[];
+  strengthsSixToTen: string[];
+  dominantDomain: string;
+  secondaryDomain: string;
+  gap: string;
+  persona: string;
+  topRoleMatch: string;
+  timestamp: string;
+}
+

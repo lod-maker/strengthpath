@@ -3,9 +3,10 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AnalysisResult, TrackId, PerfectFitRole, StretchRole, CautionRole, DomainMapping } from "@/lib/types";
+import { AnalysisResult, TrackId, PerfectFitRole, StretchRole, CautionRole, DomainMapping, ExtractedStrengths } from "@/lib/types";
 import { TRACKS } from "@/lib/accentureRoles";
 import FeedbackCard from "./FeedbackCard";
+import JoinTeamBanner from "./JoinTeamBanner";
 import {
   Download,
   RefreshCw,
@@ -27,6 +28,7 @@ interface ResultsDashboardProps {
   analysis: AnalysisResult;
   trackId: TrackId;
   userName: string;
+  strengths: ExtractedStrengths;
   personaImageUrl?: string | null;
   isGeneratingImage?: boolean;
   onReset: () => void;
@@ -100,6 +102,7 @@ export default function ResultsDashboard({
   analysis,
   trackId,
   userName,
+  strengths,
   personaImageUrl,
   isGeneratingImage = false,
   onReset,
@@ -513,6 +516,16 @@ export default function ResultsDashboard({
       <FeedbackCard
         topRole={perfectFitRoles[0]?.role || "N/A"}
         trackTitle={track.title}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          JOIN TEAM MAP
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <JoinTeamBanner
+        analysis={analysis}
+        trackId={trackId}
+        userName={userName}
+        strengths={strengths}
       />
 
       {/* ═══════════════════════════════════════════════════════════════════════
