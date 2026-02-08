@@ -27,6 +27,7 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [strengths, setStrengths] = useState<ExtractedStrengths | null>(null);
+  const [profileIcon, setProfileIcon] = useState<string | null>(null);
 
   const canAnalyze = file !== null && selectedTrack !== null;
 
@@ -55,6 +56,23 @@ export default function AnalyzePage() {
       setStrengths(data.strengths);
       setAnalysis(data.analysis);
       setStep("results");
+
+      // Fire icon generation in background -- don't block results
+      setProfileIcon(null);
+      fetch("/api/generate-icon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          moniker: data.analysis.persona.moniker,
+          dominantDomain: data.analysis.persona.dominantDomain.name,
+          topFive: data.analysis.persona.topFive,
+        }),
+      })
+        .then((res) => res.json())
+        .then((d) => {
+          if (d.imageBase64) setProfileIcon(d.imageBase64);
+        })
+        .catch(() => {}); // silently ignore
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred.";
@@ -256,6 +274,7 @@ export default function AnalyzePage() {
                 analysis={analysis}
                 trackId={selectedTrack}
                 onReset={handleReset}
+                profileIcon={profileIcon}
               />
             </motion.div>
           )}

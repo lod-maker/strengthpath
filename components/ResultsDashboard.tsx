@@ -27,6 +27,7 @@ interface ResultsDashboardProps {
   analysis: AnalysisResult;
   trackId: TrackId;
   onReset: () => void;
+  profileIcon?: string | null;
 }
 
 // ─── Helper: Star rating ────────────────────────────────────────────────────
@@ -97,6 +98,7 @@ export default function ResultsDashboard({
   analysis,
   trackId,
   onReset,
+  profileIcon,
 }: ResultsDashboardProps) {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const track = TRACKS[trackId];
@@ -148,6 +150,21 @@ export default function ResultsDashboard({
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-3">
+              {/* AI-generated profile icon */}
+              <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-accent/30">
+                {profileIcon ? (
+                  <motion.img
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    src={`data:image/png;base64,${profileIcon}`}
+                    alt="Profile icon"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-white/5 animate-pulse" />
+                )}
+              </div>
               <div className="px-3 py-1 rounded-full bg-accent/20 text-accent text-sm font-bold tracking-wide">
                 {persona.moniker}
               </div>
