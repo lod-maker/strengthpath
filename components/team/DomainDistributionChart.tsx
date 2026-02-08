@@ -17,19 +17,12 @@ interface DomainDistributionChartProps {
   members: TeamMember[];
 }
 
-interface DomainData {
-  domain: string;
-  dominant: number;
-  totalStrengths: number;
-  color: string;
-}
-
 export default function DomainDistributionChart({ members }: DomainDistributionChartProps) {
-  // Count dominant domains and total strengths per domain
+  // Count dominant domains, total strengths, and member names per domain
   const domainStats = Object.keys(GALLUP_DOMAINS).map((domain) => {
-    const dominantCount = members.filter((m) => m.dominantDomain === domain).length;
-    
-    // Count all top 10 strengths in this domain
+    const dominantMembers = members.filter((m) => m.dominantDomain === domain);
+    const dominantCount = dominantMembers.length;
+
     let totalStrengths = 0;
     members.forEach((m) => {
       const allStrengths = [...m.topFive, ...m.strengthsSixToTen];
@@ -45,14 +38,17 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
       dominant: dominantCount,
       totalStrengths,
       color: getDomainColor(domain),
+      memberNames: dominantMembers.map((m) => m.name),
     };
   });
 
-  // Sort by total strengths descending
-  domainStats.sort((a, b) => b.totalStrengths - a.totalStrengths);
+  const maxStrengths = Math.max(...domainStats.map((d) => d.totalStrengths), 1);
+
+  // Sort by total strengths descending for the bar chart
+  const sortedStats = [...domainStats].sort((a, b) => b.totalStrengths - a.totalStrengths);
 
   const strongDomains = domainStats.filter((d) => d.dominant > 0).map((d) => d.domain);
-  const weakDomain = domainStats[domainStats.length - 1];
+  const weakDomain = sortedStats[sortedStats.length - 1];
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 space-y-6">
@@ -63,11 +59,51 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
         </p>
       </div>
 
+      {/* Domain Balance Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {domainStats.map((d) => (
+          <div
+            key={d.domain}
+            className="rounded-xl border border-border bg-surface-lighter p-4 space-y-2"
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: d.color }}
+              />
+              <span className="text-xs font-medium text-gray-300 truncate">{d.domain}</span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold text-white">{d.dominant}</span>
+              <span className="text-xs text-gray-500">
+                {d.dominant === 1 ? "member" : "members"}
+              </span>
+            </div>
+            {/* Mini progress bar */}
+            <div className="w-full h-1.5 rounded-full bg-white/5">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  backgroundColor: d.color,
+                  width: `${maxStrengths > 0 ? (d.totalStrengths / maxStrengths) * 100 : 0}%`,
+                }}
+              />
+            </div>
+            <p className="text-[10px] text-gray-500">{d.totalStrengths} strengths in top 10</p>
+            {d.memberNames.length > 0 && (
+              <p className="text-[10px] text-gray-400 truncate">
+                {d.memberNames.join(", ")}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
       {/* Bar Chart */}
-      <div className="h-64">
+      <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={domainStats}
+            data={sortedStats}
             layout="vertical"
             margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
           >
@@ -79,7 +115,6 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
               fontSize={12}
               width={130}
               tickFormatter={(value) => {
-                // Shorten long names
                 if (value === "Relationship Building") return "Relationship";
                 if (value === "Strategic Thinking") return "Strategic";
                 return value;
@@ -98,7 +133,7 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
               ]}
             />
             <Bar dataKey="totalStrengths" radius={[0, 4, 4, 0]} name="Total Strengths">
-              {domainStats.map((entry, index) => (
+              {sortedStats.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
               ))}
             </Bar>
@@ -106,29 +141,10 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
         </ResponsiveContainer>
       </div>
 
-      {/* Legend */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {domainStats.map((d) => (
-          <div key={d.domain} className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: d.color }}
-            />
-            <div className="text-xs">
-              <span className="text-gray-400">{d.domain}: </span>
-              <span className="text-white font-medium">{d.dominant}</span>
-              <span className="text-gray-500"> dom, </span>
-              <span className="text-white font-medium">{d.totalStrengths}</span>
-              <span className="text-gray-500"> total</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Team Gaps Analysis */}
       <div className="pt-4 border-t border-border space-y-3">
         <h4 className="text-sm font-semibold text-white">Team Gaps Analysis</h4>
-        
+
         {strongDomains.length > 0 && (
           <div className="rounded-xl bg-green-500/5 border border-green-500/20 p-4">
             <p className="text-sm text-green-400 font-medium mb-1">Team is strong in:</p>

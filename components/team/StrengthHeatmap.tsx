@@ -8,13 +8,17 @@ interface StrengthHeatmapProps {
   members: TeamMember[];
 }
 
-// All 34 Gallup strengths in domain order
-const ALL_STRENGTHS = Object.entries(GALLUP_DOMAINS).flatMap(([domain, strengths]) =>
-  strengths.map((s) => ({ name: s, domain }))
-);
+// Group strengths by domain for section headers
+const DOMAIN_GROUPS = Object.entries(GALLUP_DOMAINS).map(([domain, strengths]) => ({
+  domain,
+  color: getDomainColor(domain),
+  strengths: strengths.map((s) => ({ name: s, domain })),
+}));
 
 export default function StrengthHeatmap({ members }: StrengthHeatmapProps) {
   if (members.length === 0) return null;
+
+  const colCount = members.length + 2; // strength col + member cols + coverage col
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 overflow-x-auto">
@@ -45,64 +49,96 @@ export default function StrengthHeatmap({ members }: StrengthHeatmapProps) {
             </tr>
           </thead>
           <tbody>
-            {ALL_STRENGTHS.map(({ name: strength, domain }) => {
-              const domainColor = getDomainColor(domain);
-              let coverageCount = 0;
-
-              return (
-                <tr key={strength} className="border-t border-border/50 hover:bg-white/2">
-                  <td className="py-1.5 px-2 sticky left-0 bg-surface z-10">
-                    <div className="flex items-center gap-2">
+            {DOMAIN_GROUPS.map(({ domain, color, strengths }) => (
+              <React.Fragment key={domain}>
+                {/* Domain group header */}
+                <tr>
+                  <td
+                    colSpan={colCount}
+                    className="sticky left-0 z-10"
+                  >
+                    <div className="flex items-center gap-2 py-2 px-2 mt-2">
                       <div
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: domainColor }}
+                        className="w-full h-0.5 rounded-full absolute left-0"
+                        style={{ backgroundColor: color, opacity: 0.3 }}
                       />
-                      <span className="text-gray-300">{strength}</span>
+                      <div
+                        className="w-3 h-3 rounded-sm flex-shrink-0 relative"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span
+                        className="text-xs font-semibold uppercase tracking-wider relative"
+                        style={{ color }}
+                      >
+                        {domain}
+                      </span>
+                      <span className="text-[10px] text-gray-500 relative">
+                        ({strengths.length})
+                      </span>
                     </div>
                   </td>
-                  {members.map((m) => {
-                    const inTop5 = m.topFive.includes(strength);
-                    const inTop10 = m.strengthsSixToTen.includes(strength);
-                    const hasStrength = inTop5 || inTop10;
-                    
-                    if (hasStrength) coverageCount++;
-
-                    return (
-                      <td key={m.id} className="py-1.5 px-1 text-center">
-                        {inTop5 ? (
-                          <div
-                            className="w-5 h-5 mx-auto rounded-md"
-                            style={{ backgroundColor: domainColor }}
-                            title={`${m.name} - Top 5`}
-                          />
-                        ) : inTop10 ? (
-                          <div
-                            className="w-5 h-5 mx-auto rounded-md"
-                            style={{ backgroundColor: domainColor, opacity: 0.3 }}
-                            title={`${m.name} - Top 10`}
-                          />
-                        ) : (
-                          <div className="w-5 h-5 mx-auto rounded-md bg-white/3" />
-                        )}
-                      </td>
-                    );
-                  })}
-                  <td className="py-1.5 px-2 text-center">
-                    <span
-                      className={`font-medium ${
-                        coverageCount === 0
-                          ? "text-gray-500"
-                          : coverageCount === 1
-                          ? "text-gray-400"
-                          : "text-white"
-                      }`}
-                    >
-                      {coverageCount}/{members.length}
-                    </span>
-                  </td>
                 </tr>
-              );
-            })}
+                {/* Strengths in this domain */}
+                {strengths.map(({ name: strength }) => {
+                  const domainColor = color;
+                  let coverageCount = 0;
+
+                  return (
+                    <tr key={strength} className="border-t border-border/50 hover:bg-white/2">
+                      <td className="py-1.5 px-2 sticky left-0 bg-surface z-10">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: domainColor }}
+                          />
+                          <span className="text-gray-300">{strength}</span>
+                        </div>
+                      </td>
+                      {members.map((m) => {
+                        const inTop5 = m.topFive.includes(strength);
+                        const inTop10 = m.strengthsSixToTen.includes(strength);
+                        const hasStrength = inTop5 || inTop10;
+
+                        if (hasStrength) coverageCount++;
+
+                        return (
+                          <td key={m.id} className="py-1.5 px-1 text-center">
+                            {inTop5 ? (
+                              <div
+                                className="w-5 h-5 mx-auto rounded-md"
+                                style={{ backgroundColor: domainColor }}
+                                title={`${m.name} - Top 5`}
+                              />
+                            ) : inTop10 ? (
+                              <div
+                                className="w-5 h-5 mx-auto rounded-md"
+                                style={{ backgroundColor: domainColor, opacity: 0.3 }}
+                                title={`${m.name} - Top 10`}
+                              />
+                            ) : (
+                              <div className="w-5 h-5 mx-auto rounded-md bg-white/3" />
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="py-1.5 px-2 text-center">
+                        <span
+                          className={`font-medium ${
+                            coverageCount === 0
+                              ? "text-gray-500"
+                              : coverageCount === 1
+                              ? "text-gray-400"
+                              : "text-white"
+                          }`}
+                        >
+                          {coverageCount}/{members.length}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </React.Fragment>
+            ))}
           </tbody>
         </table>
       </div>

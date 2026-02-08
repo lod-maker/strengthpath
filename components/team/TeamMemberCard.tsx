@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { TeamMember } from "@/lib/types";
-import { GALLUP_DOMAINS, getDomainColor } from "@/lib/gallupDomains";
+import { getDomainColor } from "@/lib/gallupDomains";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface TeamMemberCardProps {
   member: TeamMember;
@@ -22,10 +24,11 @@ const trackBadgeColors: Record<string, string> = {
 };
 
 export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps) {
-  const [showTop10, setShowTop10] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
   const domainColor = getDomainColor(member.dominantDomain);
   const trackGradient = trackColors[member.track] || "from-gray-500/20 to-gray-600/10 border-gray-500/30";
   const trackBadge = trackBadgeColors[member.track] || "bg-gray-500/20 text-gray-400 border-gray-500/30";
+  const hasMore = member.strengthsSixToTen.length > 0;
 
   const handleRemove = () => {
     if (onRemove && window.confirm(`Remove ${member.name} from the Team Map?`)) {
@@ -36,8 +39,6 @@ export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps
   return (
     <div
       className={`group relative rounded-2xl border bg-gradient-to-br ${trackGradient} p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent/5`}
-      onMouseEnter={() => setShowTop10(true)}
-      onMouseLeave={() => setShowTop10(false)}
     >
       {/* Domain indicator bar */}
       <div
@@ -89,21 +90,42 @@ export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps
         </div>
       </div>
 
-      {/* Hover reveal: Strengths 6-10 */}
-      {showTop10 && member.strengthsSixToTen.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-white/10 animate-in fade-in duration-200">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Strengths 6-10</p>
-          <div className="flex flex-wrap gap-1.5">
-            {member.strengthsSixToTen.map((strength, i) => (
-              <span
-                key={strength}
-                className="text-xs font-medium px-2 py-1 rounded-md bg-white/3 border border-white/5 text-gray-400"
+      {/* Expandable Strengths 6-10 */}
+      {hasMore && (
+        <>
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="mt-2 flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {expanded ? "Show less" : "Show 6-10"}
+          </button>
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
               >
-                #{i + 6} {strength}
-              </span>
-            ))}
-          </div>
-        </div>
+                <div className="mt-2 pt-3 border-t border-white/10">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Strengths 6-10</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {member.strengthsSixToTen.map((strength, i) => (
+                      <span
+                        key={strength}
+                        className="text-xs font-medium px-2 py-1 rounded-md bg-white/3 border border-white/5 text-gray-400"
+                      >
+                        #{i + 6} {strength}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
       {/* Top role match */}
@@ -114,10 +136,10 @@ export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps
         </div>
       )}
 
-      {/* Remove link */}
+      {/* Remove link — always visible on mobile, hover on desktop */}
       <button
         onClick={handleRemove}
-        className="absolute bottom-3 right-3 text-[10px] text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute bottom-3 right-3 text-[10px] text-gray-500 hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
       >
         Remove me
       </button>

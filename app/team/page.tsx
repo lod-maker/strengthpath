@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { TeamMember } from "@/lib/types";
+import { GALLUP_DOMAINS, getDomainColor } from "@/lib/gallupDomains";
+import { ACCENTURE_ROLES } from "@/lib/accentureRoles";
 import TeamMemberCard from "@/components/team/TeamMemberCard";
 import DomainDistributionChart from "@/components/team/DomainDistributionChart";
 import StrengthHeatmap from "@/components/team/StrengthHeatmap";
 import RoleCoverage from "@/components/team/RoleCoverage";
-import { ArrowLeft, Users, RefreshCw } from "lucide-react";
+import { ArrowLeft, Users, RefreshCw, Layers, Target, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function TeamPage() {
@@ -48,6 +50,60 @@ export default function TeamPage() {
       alert("Failed to remove member. Please try again.");
     }
   };
+
+  // Compute stats
+  const stats = useMemo(() => {
+    if (members.length === 0) return null;
+
+    const domains = Object.keys(GALLUP_DOMAINS);
+    const coveredDomains = domains.filter(
+      (d) => members.some((m) => m.dominantDomain === d)
+    );
+
+    const allStrengths = new Set<string>();
+    members.forEach((m) => {
+      m.topFive.forEach((s) => allStrengths.add(s));
+      m.strengthsSixToTen.forEach((s) => allStrengths.add(s));
+    });
+
+    const coveredRoles = new Set(
+      members.map((m) => m.topRoleMatch).filter(Boolean)
+    );
+
+    return {
+      memberCount: members.length,
+      domainsCovered: coveredDomains.length,
+      domainsTotal: domains.length,
+      coveredDomainNames: coveredDomains,
+      uniqueStrengths: allStrengths.size,
+      rolesCovered: coveredRoles.size,
+      rolesTotal: ACCENTURE_ROLES.length,
+    };
+  }, [members]);
+
+  // Compute team insights (shared & unique strengths)
+  const insights = useMemo(() => {
+    if (members.length < 2) return null;
+
+    const strengthCount: Record<string, number> = {};
+    members.forEach((m) => {
+      [...m.topFive, ...m.strengthsSixToTen].forEach((s) => {
+        strengthCount[s] = (strengthCount[s] || 0) + 1;
+      });
+    });
+
+    const shared = Object.entries(strengthCount)
+      .filter(([, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    const unique = Object.entries(strengthCount)
+      .filter(([, count]) => count === 1)
+      .map(([name]) => name)
+      .slice(0, 8);
+
+    return { shared, unique };
+  }, [members]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -154,13 +210,70 @@ export default function TeamPage() {
         )}
 
         {/* Team data */}
-        {!loading && !error && members.length > 0 && (
+        {!loading && !error && members.length > 0 && stats && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="space-y-8"
           >
-            {/* Team Overview Grid */}
+            {/* Summary Stats Row */}
+            <section>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Members */}
+                <div className="rounded-2xl border border-border bg-surface p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-accent" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">Members</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white">{stats.memberCount}</p>
+                </div>
+                {/* Domain Balance */}
+                <div className="rounded-2xl border border-border bg-surface p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Layers className="w-4 h-4 text-accent" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">Domains</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white">
+                    {stats.domainsCovered}/{stats.domainsTotal}
+                  </p>
+                  <div className="flex gap-1 mt-2">
+                    {Object.keys(GALLUP_DOMAINS).map((d) => (
+                      <div
+                        key={d}
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: getDomainColor(d),
+                          opacity: stats.coveredDomainNames.includes(d) ? 1 : 0.2,
+                        }}
+                        title={d}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {/* Strength Coverage */}
+                <div className="rounded-2xl border border-border bg-surface p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-accent" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">Strengths</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white">{stats.uniqueStrengths}/34</p>
+                  <p className="text-[10px] text-gray-500 mt-1">unique in top 10</p>
+                </div>
+                {/* Role Coverage */}
+                <div className="rounded-2xl border border-border bg-surface p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-accent" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">Roles</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white">
+                    {stats.rolesCovered}/{stats.rolesTotal}
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-1">roles covered</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Team Members Grid */}
             <section>
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5 text-accent" />
@@ -182,6 +295,56 @@ export default function TeamPage() {
                 ))}
               </div>
             </section>
+
+            {/* Team Insights */}
+            {insights && (
+              <section className="rounded-2xl border border-border bg-surface p-6 space-y-4">
+                <h3 className="text-lg font-semibold text-white">Team Insights</h3>
+
+                {insights.shared.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                      Shared Strengths
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {insights.shared.map(([name, count]) => (
+                        <span
+                          key={name}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/20 text-accent"
+                        >
+                          {name}
+                          <span className="text-[10px] text-accent/60">{count}x</span>
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      These strengths appear in multiple members&apos; top 10 — a strong team foundation.
+                    </p>
+                  </div>
+                )}
+
+                {insights.unique.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                      Unique Differentiators
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {insights.unique.map((name) => (
+                        <span
+                          key={name}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300"
+                        >
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Strengths only one member has — these people bring something no one else on the team does.
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* Domain Distribution */}
             <section>
