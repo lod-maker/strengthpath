@@ -1,6 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 
+// Domain-specific visual metaphors
+const DOMAIN_METAPHORS: Record<string, string> = {
+  "Executing": "Focused, structured, kinetic visual elements like gears, arrows, building blocks, and precision lines.",
+  "Influencing": "Energetic, radiating, bold visual elements like ripples, soundwaves, sparks, and megaphone shapes.",
+  "Relationship Building": "Organic, connected, warm visual elements like interconnected nodes, weaving threads, and organic bonds.",
+  "Strategic Thinking": "Abstract, futuristic, visionary visual elements like constellations, neural networks, light bulbs, and horizon lines.",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { moniker, dominantDomain, topFive } = await req.json();
@@ -30,10 +38,17 @@ export async function POST(req: NextRequest) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const prompt = `Create a minimalist, abstract, professional illustration representing a persona called '${moniker}'. Their dominant strength is '${domainName}' and their top strengths are ${topFiveString}. Style: modern, dark theme compatible, abstract geometric shapes, Accenture brand colors (purple #A100FF, blue, black), no text, no words, no letters.`;
+    // Select metaphor based on domain, with a fallback
+    const metaphor = DOMAIN_METAPHORS[domainName] || "Abstract, professional geometric shapes representing strength and growth.";
+
+    const prompt = `Create a minimalist, abstract, professional illustration representing a persona called '${moniker}'. 
+The dominant theme is '${domainName}', visualized as: ${metaphor}
+The image should subtly incorporate elements representing these top strengths: ${topFiveString}.
+Style: modern, dark theme compatible, using Accenture brand colors (purple #A100FF, blue, black) and gradients.
+Constraints: NO text, NO words, NO letters, high quality, vector art style.`;
 
     const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image",
+      model: "gemini-2.5-flash-image", 
       contents: prompt,
     });
 

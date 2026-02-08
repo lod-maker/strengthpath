@@ -113,7 +113,7 @@ export default function LandingPage() {
             {
               icon: <Shield className="w-6 h-6" />,
               title: "Private & Secure",
-              desc: "Your PDF is processed in memory and never stored. No data leaves the analysis session.",
+              desc: "Your PDF is processed in memory and never stored. Only your extracted strengths are sent to AI for analysis — no files are kept.",
             },
           ].map((feature, i) => (
             <motion.div
