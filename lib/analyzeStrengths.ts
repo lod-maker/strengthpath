@@ -212,7 +212,7 @@ export async function analyzeStrengths(
     config: {
       temperature: 1,
       maxOutputTokens: 40000,
-      tools: [{ googleSearch: {} }],
+      responseMimeType: "application/json",
     },
   });
 
