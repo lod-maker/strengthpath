@@ -23,15 +23,22 @@ export default function JoinTeamBanner({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Pre-fill name from PDF extraction, but skip generic fallback
+  const [name, setName] = useState(
+    userName && userName !== "Team Member" ? userName : ""
+  );
+
+  const canJoin = name.trim().length > 0;
 
   const handleJoin = async () => {
+    if (!canJoin) return;
     setIsSubmitting(true);
     setError(null);
 
     try {
       // Extract minimal data for TeamMember
       const topFive = analysis.persona.topFive;
-      
+
       // Get strengths 6-10 from the full strengths list
       const strengthsSixToTen = strengths
         .filter((s) => s.rank >= 6 && s.rank <= 10)
@@ -50,7 +57,7 @@ export default function JoinTeamBanner({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: userName,
+          name: name.trim(),
           track: trackTitle,
           topFive,
           strengthsSixToTen,
@@ -97,41 +104,58 @@ export default function JoinTeamBanner({
             <Users className="w-32 h-32" />
           </div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex-1">
+          <div className="relative z-10 flex flex-col gap-4">
+            <div>
               <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                 <Users className="w-5 h-5 text-accent" />
                 Join the Team Map
               </h3>
               <p className="text-gray-300 max-w-xl">
                 Share your strength profile with the team to help visualize our collective talents, gaps, and role coverage.
-                This helps in better team formation and project assignments.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              {isSuccess ? (
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Added to Team Map!</span>
-                </div>
-              ) : (
-                <>
-                  <Button variant="ghost" onClick={handleDismiss} disabled={isSubmitting}>
-                    No thanks
-                  </Button>
-                  <Button onClick={handleJoin} disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <span className="animate-pulse">Joining...</span>
-                    ) : (
-                      "Join Team Map"
-                    )}
-                  </Button>
-                </>
-              )}
+            {/* Name input + actions row */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex items-center gap-2 flex-1 max-w-xs">
+                <label htmlFor="team-name" className="text-sm text-gray-400 whitespace-nowrap">
+                  Your name:
+                </label>
+                <input
+                  id="team-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  disabled={isSubmitting || isSuccess}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-accent/50 disabled:opacity-50"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                {isSuccess ? (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg">
+                    <CheckCircle className="w-5 h-5" />
+                    <span className="font-medium">Added to Team Map!</span>
+                  </div>
+                ) : (
+                  <>
+                    <Button variant="ghost" onClick={handleDismiss} disabled={isSubmitting}>
+                      No thanks
+                    </Button>
+                    <Button onClick={handleJoin} disabled={isSubmitting || !canJoin}>
+                      {isSubmitting ? (
+                        <span className="animate-pulse">Joining...</span>
+                      ) : (
+                        "Join Team Map"
+                      )}
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-          
+
           {error && (
             <div className="mt-4 flex items-center gap-2 text-red-400 text-sm">
               <XCircle className="w-4 h-4" />
