@@ -105,82 +105,18 @@ Note: People CAN move between tracks over time. Flag strong fits outside the cur
 
 YOUR TASK
 
-Analyze the candidate's strengths profile and generate a Strategic Talent Analysis.
+Analyze this person's strengths against the roles above. Write as much as you need — be thorough, honest, and insightful. Every text field below is free-form: write full paragraphs, not bullet points or single sentences. Go deep. Return 9 perfectFitRoles, at least 4 cautionRoles, and 2-3 stretchRoles.
 
-CRITICAL INSTRUCTIONS:
-
-1. Every role recommendation MUST reference the actual Accenture role description provided above. Do not invent generic descriptions.
-2. When explaining "why it fits," cite specific responsibilities from the role definitions.
-3. Strength Synergies are mandatory. Never analyse a strength in isolation. Always show how two strengths combine to create a specific capability.
-4. The Gap analysis must be honest but framed constructively. It's not a weakness — it's a leadership style that needs conscious supplementation.
-5. Star ratings must be justified. Don't give 5 stars unless the match is exceptional across multiple dimensions.
-6. Use your expertise to determine which strengths each role demands and which bottom-ranked strengths would be red flags. Base this on the role descriptions, not on hardcoded lists.
-7. Track filtering: Perfect Fit roles MUST come from the candidate's selected track. Stretch roles should come from other tracks.
-8. You MUST return exactly 9 roles in the perfectFitRoles array. Each role gets a star rating (1-5) based on actual fit — not every role needs to be 4 or 5 stars. Be honest.
-9. You MUST return at least 4 roles in the cautionRoles array. These are roles within or near the track that would drain or frustrate this person.
-9. Be direct and specific. No corporate fluff. Write like a coach who genuinely wants this person to succeed.
-
----
-
-RESPONSE FORMAT: Respond ONLY in valid JSON with this structure:
+Respond ONLY in valid JSON matching this shape:
 
 {
-  "persona": {
-    "moniker": "The Strategic Fixer",
-    "narrative": "...",
-    "topFive": ["Achiever", "Strategic", "Learner", "Communication", "Arranger"],
-    "dominantDomain": { "name": "Strategic Thinking", "description": "..." },
-    "secondaryDomain": { "name": "Executing", "description": "..." },
-    "gap": { "domain": "Relationship Building", "description": "..." }
-  },
-  "domainMapping": [
-    {
-      "domain": "Strategic Thinking",
-      "isPrimary": true,
-      "strengths": [
-        { "name": "Strategic", "rank": 2, "drive": "Sees the optimal path forward" }
-      ]
-    }
-  ],
-  "perfectFitRoles": [
-    {
-      "role": "Business Analyst",
-      "stars": 5,
-      "why": "...",
-      "synergy": "...",
-      "watchOut": "..."
-    }
-  ],
-  "stretchRoles": [
-    {
-      "role": "Product Owner",
-      "stars": 4,
-      "naturalTrack": "Tech Transformation",
-      "why": "...",
-      "timeline": "..."
-    }
-  ],
-  "cautionRoles": [
-    {
-      "role": "Scrum Master",
-      "stars": 2,
-      "friction": "...",
-      "mismatch": "..."
-    }
-  ],
-  "teamDynamics": {
-    "whatYouBring": "...",
-    "seekOutTeammatesWith": [
-      { "strength": "Empathy", "why": "..." }
-    ],
-    "idealTeamComposition": "..."
-  },
-  "actionPlan": {
-    "immediatePlacement": { "role": "...", "why": "..." },
-    "sixMonthDevelopment": "...",
-    "blindSpotManagement": "...",
-    "eighteenMonthTarget": { "role": "...", "requirement": "..." }
-  }
+  "persona": { "moniker": "", "narrative": "", "topFive": [], "dominantDomain": { "name": "", "description": "" }, "secondaryDomain": { "name": "", "description": "" }, "gap": { "domain": "", "description": "" } },
+  "domainMapping": [{ "domain": "", "isPrimary": false, "strengths": [{ "name": "", "rank": 0, "drive": "" }] }],
+  "perfectFitRoles": [{ "role": "", "stars": 0, "why": "", "synergy": "", "watchOut": "" }],
+  "stretchRoles": [{ "role": "", "stars": 0, "naturalTrack": "", "why": "", "timeline": "" }],
+  "cautionRoles": [{ "role": "", "stars": 0, "friction": "", "mismatch": "" }],
+  "teamDynamics": { "whatYouBring": "", "seekOutTeammatesWith": [{ "strength": "", "why": "" }], "idealTeamComposition": "" },
+  "actionPlan": { "immediatePlacement": { "role": "", "why": "" }, "sixMonthDevelopment": "", "blindSpotManagement": "", "eighteenMonthTarget": { "role": "", "requirement": "" } }
 }`;
 
 export async function analyzeStrengths(
@@ -233,7 +169,7 @@ export async function analyzeStrengths(
     contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
     config: {
       temperature: 1,
-      maxOutputTokens: 40000,
+      maxOutputTokens: 60000,
       responseMimeType: "application/json",
     },
   });
