@@ -176,7 +176,7 @@ export async function analyzeStrengths(
     contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
     config: {
       temperature: 1,
-      maxOutputTokens: 65535,
+      maxOutputTokens: 32768,
       responseMimeType: "application/json",
     },
   });
