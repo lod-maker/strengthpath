@@ -11,6 +11,7 @@ import {
   AnalysisResult,
   AppStep,
   ExtractedStrengths,
+  SessionResult,
   TrackId,
 } from "@/lib/types";
 import Link from "next/link";
@@ -28,6 +29,10 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [strengths, setStrengths] = useState<ExtractedStrengths | null>(null);
+  const [sessionResult, setSessionResult] = useState<SessionResult | null>(null);
+
+  const [personaImageUrl, setPersonaImageUrl] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
 
   const canAnalyze = file !== null && selectedTrack !== null && userName.trim().length > 0;
 
@@ -36,6 +41,8 @@ export default function AnalyzePage() {
 
     setError(null);
     setStep("loading");
+    setPersonaImageUrl(null);
+    setIsGeneratingImage(false);
 
     try {
       const formData = new FormData();
@@ -54,9 +61,48 @@ export default function AnalyzePage() {
         throw new Error(data.error || "Analysis failed. Please try again.");
       }
 
+      // PDF was sent and processed server-side — drop the File reference
+      setFile(null);
+
       setStrengths(data.strengths);
       setAnalysis(data.analysis);
+      setSessionResult({
+        name: userName.trim(),
+        track: selectedTrack,
+        extractedStrengths: data.strengths,
+        aiAnalysis: data.analysis,
+        timestamp: new Date().toISOString(),
+      });
       setStep("results");
+
+      // Generate persona image in background
+      if (data.analysis?.persona) {
+        setIsGeneratingImage(true);
+        fetch("/api/generate-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            moniker: data.analysis.persona.moniker,
+            dominantDomain: data.analysis.persona.dominantDomain.name,
+            topFive: data.analysis.persona.topFive,
+          }),
+        })
+          .then(async (res) => {
+            if (res.ok) {
+              const imgData = await res.json();
+              if (imgData.imageUrl) {
+                setPersonaImageUrl(imgData.imageUrl);
+              }
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to generate persona image:", err);
+          })
+          .finally(() => {
+            setIsGeneratingImage(false);
+          });
+      }
+
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred.";
@@ -69,7 +115,9 @@ export default function AnalyzePage() {
     setStep("upload");
     setAnalysis(null);
     setStrengths(null);
-    // Keep the file so they don't have to re-upload
+    setSessionResult(null);
+    setPersonaImageUrl(null);
+    setIsGeneratingImage(false);
   }, []);
 
   return (
@@ -279,6 +327,8 @@ export default function AnalyzePage() {
                 analysis={analysis}
                 trackId={selectedTrack}
                 userName={userName}
+                personaImageUrl={personaImageUrl}
+                isGeneratingImage={isGeneratingImage}
                 onReset={handleReset}
               />
             </motion.div>

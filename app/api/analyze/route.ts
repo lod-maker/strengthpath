@@ -53,20 +53,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert File to Buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Step 1: Parse the PDF
+    // Step 1: Parse PDF in an isolated scope — buffer is discarded immediately
     let strengths;
-    try {
-      strengths = await parseGallupPDF(buffer);
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Failed to parse the PDF. Please check the file and try again.";
-      return NextResponse.json({ error: message }, { status: 422 });
+    {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      try {
+        strengths = await parseGallupPDF(buffer);
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to parse the PDF. Please check the file and try again.";
+        return NextResponse.json({ error: message }, { status: 422 });
+      }
+      // buffer goes out of scope here — PDF is gone, eligible for GC
     }
 
     if (strengths.length === 0) {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Analyze with Claude against all 27 roles
+    // Step 2: Analyze against all 27 roles (PDF no longer in memory)
     let analysis;
     try {
       analysis = await analyzeStrengths(strengths, trackId as TrackId, name);

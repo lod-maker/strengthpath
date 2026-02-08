@@ -27,6 +27,8 @@ interface ResultsDashboardProps {
   analysis: AnalysisResult;
   trackId: TrackId;
   userName: string;
+  personaImageUrl?: string | null;
+  isGeneratingImage?: boolean;
   onReset: () => void;
 }
 
@@ -98,6 +100,8 @@ export default function ResultsDashboard({
   analysis,
   trackId,
   userName,
+  personaImageUrl,
+  isGeneratingImage = false,
   onReset,
 }: ResultsDashboardProps) {
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -181,15 +185,39 @@ export default function ResultsDashboard({
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-            <Button variant="outline" size="sm" onClick={onReset}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Start Over
-            </Button>
-            <Button variant="secondary" size="sm" onClick={handleDownload}>
-              <Download className="w-4 h-4 mr-2" />
-              Download Report
-            </Button>
+          <div className="flex flex-col gap-4 flex-shrink-0 items-center md:items-end">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button variant="outline" size="sm" onClick={onReset}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Start Over
+              </Button>
+              <Button variant="secondary" size="sm" onClick={handleDownload}>
+                <Download className="w-4 h-4 mr-2" />
+                Download Report
+              </Button>
+            </div>
+            
+            {/* Persona Image */}
+            <div className="w-48 h-64 rounded-xl overflow-hidden bg-surface-lighter mt-2 border border-white/10 shadow-xl relative group">
+              {personaImageUrl ? (
+                <img 
+                  src={personaImageUrl} 
+                  alt={persona.moniker} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : isGeneratingImage ? (
+                <div className="w-full h-full animate-pulse bg-white/5 flex flex-col items-center justify-center gap-3">
+                   <div className="w-12 h-12 rounded-full bg-white/10" />
+                   <span className="text-xs text-gray-500 font-medium">Generating...</span>
+                </div>
+              ) : (
+                <div className="w-full h-full bg-white/5 flex flex-col items-center justify-center gap-3 text-gray-600">
+                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                     <span className="text-2xl opacity-50">?</span>
+                   </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

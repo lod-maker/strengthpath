@@ -125,9 +125,9 @@ export type AnalysisResult = {
 
 export type SessionResult = {
   name: string;
-  track: TrackId;
-  strengths: ExtractedStrengths;
-  analysis: AnalysisResult;
+  track: string;
+  extractedStrengths: ExtractedStrengths;
+  aiAnalysis: AnalysisResult;
   timestamp: string;
 };
 
