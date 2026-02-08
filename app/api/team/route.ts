@@ -1,25 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
 import { TeamMember } from "@/lib/types";
-
-const DATA_FILE = join(process.cwd(), "data", "team-results.json");
-
-function getTeamMembers(): TeamMember[] {
-  if (!existsSync(DATA_FILE)) {
-    return [];
-  }
-  try {
-    const data = readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-function saveTeamMembers(members: TeamMember[]): void {
-  writeFileSync(DATA_FILE, JSON.stringify(members, null, 2));
-}
+import { getTeamMembers, saveTeamMembers } from "@/lib/redis";
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -28,7 +9,7 @@ function generateId(): string {
 // ─── GET /api/team ───────────────────────────────────────────────────────────
 export async function GET() {
   try {
-    const members = getTeamMembers();
+    const members = await getTeamMembers();
     return NextResponse.json(members);
   } catch (error) {
     console.error("Failed to read team members:", error);
@@ -43,20 +24,20 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate required fields
     const { name, track, topFive, strengthsSixToTen, dominantDomain, secondaryDomain, gap, persona, topRoleMatch } = body;
-    
+
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
-    
+
     if (!track || !topFive || !Array.isArray(topFive) || topFive.length === 0) {
       return NextResponse.json({ error: "Missing required strength data" }, { status: 400 });
     }
 
-    const members = getTeamMembers();
-    
+    const members = await getTeamMembers();
+
     // Check for existing member by name (case-insensitive)
     const existingIndex = members.findIndex(
       (m) => m.name.toLowerCase() === name.trim().toLowerCase()
@@ -84,7 +65,7 @@ export async function POST(request: NextRequest) {
       members.push(memberData);
     }
 
-    saveTeamMembers(members);
+    await saveTeamMembers(members);
 
     return NextResponse.json({
       success: true,

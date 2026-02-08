@@ -92,7 +92,7 @@ export default function DomainDistributionChart({ members }: DomainDistributionC
                 borderRadius: "8px",
                 color: "#fff",
               }}
-              formatter={(value: number | undefined, name: string) => [
+              formatter={(value, name) => [
                 value,
                 name === "dominant" ? "Dominant Domain Count" : "Total Strengths in Top 10",
               ]}
