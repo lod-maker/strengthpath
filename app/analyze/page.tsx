@@ -46,7 +46,12 @@ export default function AnalyzePage() {
         body: formData,
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("The analysis took too long or the server returned an invalid response. Please try again.");
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Analysis failed. Please try again.");
