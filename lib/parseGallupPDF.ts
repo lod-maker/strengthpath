@@ -16,6 +16,26 @@ export interface ParsedGallupResult {
   extractedName: string;
 }
 
+// Common words that appear in Gallup report headings but are NOT names
+const NON_NAME_WORDS = [
+  "applying", "your", "most", "powerful", "signature", "theme", "themes",
+  "top", "report", "results", "cliftonstrengths", "strengthsfinder",
+  "gallup", "assessment", "discover", "understanding", "the", "and",
+  "how", "what", "why", "when", "with", "from", "about", "into",
+  "action", "planning", "guide", "overview", "summary", "profile",
+  "natural", "talents", "talent", "strengths", "domain", "domains",
+];
+
+function looksLikeName(candidate: string): boolean {
+  const words = candidate.trim().split(/\s+/);
+  if (words.length < 1 || words.length > 4) return false;
+  // Reject if any word is a common non-name word
+  if (words.some((w) => NON_NAME_WORDS.includes(w.toLowerCase()))) return false;
+  // Reject if it's a known strength name
+  if (GALLUP_STRENGTHS.includes(candidate.trim())) return false;
+  return true;
+}
+
 /**
  * Extract the person's name from the Gallup PDF text.
  * Gallup reports typically have the name near the top in various formats.
@@ -23,35 +43,20 @@ export interface ParsedGallupResult {
 function extractNameFromText(text: string): string {
   // Pattern 1: Look for "[Name]'s Signature Themes" or "[Name]'s Top 5"
   const signatureMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})'s\s+(?:Signature|Top|CliftonStrengths)/i);
-  if (signatureMatch) {
+  if (signatureMatch && looksLikeName(signatureMatch[1])) {
     return signatureMatch[1].trim();
   }
 
   // Pattern 2: Look for name after "Report for" or "Prepared for"
   const reportForMatch = text.match(/(?:Report|Prepared|Results)\s+for\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
-  if (reportForMatch) {
+  if (reportForMatch && looksLikeName(reportForMatch[1])) {
     return reportForMatch[1].trim();
   }
 
-  // Pattern 3: Look for a name at the very beginning of the document (first 500 chars)
-  // Gallup reports often start with the person's name
-  const firstPart = text.substring(0, 500);
-  const nameAtStartMatch = firstPart.match(/^\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s*(?:\n|CliftonStrengths|Signature)/m);
-  if (nameAtStartMatch) {
-    // Make sure it's not a strength name
-    const possibleName = nameAtStartMatch[1].trim();
-    if (!GALLUP_STRENGTHS.includes(possibleName) && possibleName.includes(" ")) {
-      return possibleName;
-    }
-  }
-
-  // Pattern 4: Look for common name patterns near "©" or copyright
+  // Pattern 3: Look for "[Name] | CliftonStrengths" (footer format)
   const copyrightMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s+\|\s+CliftonStrengths/i);
-  if (copyrightMatch) {
-    const possibleName = copyrightMatch[1].trim();
-    if (!GALLUP_STRENGTHS.includes(possibleName)) {
-      return possibleName;
-    }
+  if (copyrightMatch && looksLikeName(copyrightMatch[1])) {
+    return copyrightMatch[1].trim();
   }
 
   return "";
