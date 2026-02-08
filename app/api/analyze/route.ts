@@ -14,16 +14,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("pdf") as File | null;
     const trackId = formData.get("trackId") as string | null;
-    const name = (formData.get("name") as string | null)?.trim() || "";
 
     // Validate inputs
-    if (!name) {
-      return NextResponse.json(
-        { error: "Please enter your name." },
-        { status: 400 }
-      );
-    }
-
     if (!file) {
       return NextResponse.json(
         { error: "No PDF file uploaded." },
@@ -55,10 +47,13 @@ export async function POST(request: NextRequest) {
 
     // Step 1: Parse PDF in an isolated scope — buffer is discarded immediately
     let strengths;
+    let extractedName = "";
     {
       const buffer = Buffer.from(await file.arrayBuffer());
       try {
-        strengths = await parseGallupPDF(buffer);
+        const result = await parseGallupPDF(buffer);
+        strengths = result.strengths;
+        extractedName = result.extractedName;
       } catch (err) {
         const message =
           err instanceof Error
@@ -68,6 +63,9 @@ export async function POST(request: NextRequest) {
       }
       // buffer goes out of scope here — PDF is gone, eligible for GC
     }
+
+    // Use extracted name or fallback to "Team Member"
+    const name = extractedName || "Team Member";
 
     if (strengths.length === 0) {
       return NextResponse.json(

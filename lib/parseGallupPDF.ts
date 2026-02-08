@@ -11,7 +11,53 @@ const GALLUP_STRENGTHS = [
   "Self-Assurance", "Significance", "Strategic", "Woo"
 ];
 
-export async function parseGallupPDF(fileBuffer: Buffer): Promise<ExtractedStrengths> {
+export interface ParsedGallupResult {
+  strengths: ExtractedStrengths;
+  extractedName: string;
+}
+
+/**
+ * Extract the person's name from the Gallup PDF text.
+ * Gallup reports typically have the name near the top in various formats.
+ */
+function extractNameFromText(text: string): string {
+  // Pattern 1: Look for "[Name]'s Signature Themes" or "[Name]'s Top 5"
+  const signatureMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})'s\s+(?:Signature|Top|CliftonStrengths)/i);
+  if (signatureMatch) {
+    return signatureMatch[1].trim();
+  }
+
+  // Pattern 2: Look for name after "Report for" or "Prepared for"
+  const reportForMatch = text.match(/(?:Report|Prepared|Results)\s+for\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
+  if (reportForMatch) {
+    return reportForMatch[1].trim();
+  }
+
+  // Pattern 3: Look for a name at the very beginning of the document (first 500 chars)
+  // Gallup reports often start with the person's name
+  const firstPart = text.substring(0, 500);
+  const nameAtStartMatch = firstPart.match(/^\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s*(?:\n|CliftonStrengths|Signature)/m);
+  if (nameAtStartMatch) {
+    // Make sure it's not a strength name
+    const possibleName = nameAtStartMatch[1].trim();
+    if (!GALLUP_STRENGTHS.includes(possibleName) && possibleName.includes(" ")) {
+      return possibleName;
+    }
+  }
+
+  // Pattern 4: Look for common name patterns near "©" or copyright
+  const copyrightMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s+\|\s+CliftonStrengths/i);
+  if (copyrightMatch) {
+    const possibleName = copyrightMatch[1].trim();
+    if (!GALLUP_STRENGTHS.includes(possibleName)) {
+      return possibleName;
+    }
+  }
+
+  return "";
+}
+
+export async function parseGallupPDF(fileBuffer: Buffer): Promise<ParsedGallupResult> {
   // Dynamic import for pdf-parse (works better with Next.js server-side)
   const pdfParse = (await import("pdf-parse")).default;
 
@@ -120,6 +166,12 @@ export async function parseGallupPDF(fileBuffer: Buffer): Promise<ExtractedStren
     );
   }
 
-  // Return top strengths (up to 34, but typically 5 or 10)
-  return strengths.slice(0, 34);
+  // Extract name from the PDF text
+  const extractedName = extractNameFromText(text);
+
+  // Return parsed result with strengths and name
+  return {
+    strengths: strengths.slice(0, 34),
+    extractedName,
+  };
 }

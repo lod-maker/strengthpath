@@ -34,10 +34,10 @@ export default function AnalyzePage() {
   const [personaImageUrl, setPersonaImageUrl] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
 
-  const canAnalyze = file !== null && selectedTrack !== null && userName.trim().length > 0;
+  const canAnalyze = file !== null && selectedTrack !== null;
 
   const handleAnalyze = useCallback(async () => {
-    if (!file || !selectedTrack || !userName.trim()) return;
+    if (!file || !selectedTrack) return;
 
     setError(null);
     setStep("loading");
@@ -48,7 +48,6 @@ export default function AnalyzePage() {
       const formData = new FormData();
       formData.append("pdf", file);
       formData.append("trackId", selectedTrack);
-      formData.append("name", userName.trim());
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -64,10 +63,14 @@ export default function AnalyzePage() {
       // PDF was sent and processed server-side — drop the File reference
       setFile(null);
 
+      // Name is now extracted from PDF
+      const extractedName = data.name || "Team Member";
+      setUserName(extractedName);
+
       setStrengths(data.strengths);
       setAnalysis(data.analysis);
       setSessionResult({
-        name: userName.trim(),
+        name: extractedName,
         track: selectedTrack,
         extractedStrengths: data.strengths,
         aiAnalysis: data.analysis,
@@ -231,44 +234,25 @@ export default function AnalyzePage() {
                 </motion.div>
               )}
 
-              {/* Step 1: Your Name */}
-              <section>
-                <div className="mb-4">
-                  <h2 className="text-2xl font-bold text-white">
-                    Step 1: Your name
-                  </h2>
-                  <p className="text-gray-400 mt-1">
-                    So we can personalise your report.
-                  </p>
-                </div>
-                <input
-                  type="text"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  placeholder="e.g. Michele Lodetti"
-                  className="w-full max-w-md rounded-xl bg-surface border border-border px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/30 transition-colors"
-                />
-              </section>
-
-              {/* Step 2: Upload */}
+              {/* Step 1: Upload */}
               <section>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white">
-                    Step 2: Upload your report
+                    Step 1: Upload your report
                   </h2>
                   <p className="text-gray-400 mt-1">
                     Upload the PDF you received from the Gallup CliftonStrengths
-                    assessment.
+                    assessment. Your name will be extracted automatically.
                   </p>
                 </div>
                 <UploadZone file={file} onFileSelect={setFile} />
               </section>
 
-              {/* Step 3: Select Track */}
+              {/* Step 2: Select Track */}
               <section>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white">
-                    Step 3: Which track were you hired into?
+                    Step 2: Which track were you hired into?
                   </h2>
                   <p className="text-gray-400 mt-1">
                     We&apos;ll analyze your strengths against all 27 roles, prioritising
