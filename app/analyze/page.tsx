@@ -280,9 +280,7 @@ export default function AnalyzePage() {
 
               {!canAnalyze && (
                 <p className="text-center text-sm text-gray-500">
-                  {!userName.trim()
-                    ? "Enter your name to get started"
-                    : !file && !selectedTrack
+                  {!file && !selectedTrack
                     ? "Upload your PDF and select your track to begin"
                     : !file
                     ? "Upload your CliftonStrengths PDF to continue"
