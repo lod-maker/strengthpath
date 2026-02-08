@@ -37,64 +37,88 @@ export type AccentureRole = {
   strengthsFit: string[];
 };
 
-// ─── AI Analysis Response Types (27-role matching) ───────────────────────────
+// ─── AI Analysis Response Types ──────────────────────────────────────────────
 
-export type FitTier = "Exceptional Fit" | "Strong Fit" | "Good Fit" | "Moderate Fit" | "Developing Fit";
-
-export type StrengthAlignment = {
-  strength: string;
-  relevance: string;
+export type PersonaDomain = {
+  name: string;
+  description: string;
 };
 
-export type RoleMatch = {
+export type PersonaGap = {
+  domain: string;
+  description: string;
+};
+
+export type Persona = {
+  moniker: string;
+  narrative: string;
+  topFive: string[];
+  dominantDomain: PersonaDomain;
+  secondaryDomain: PersonaDomain;
+  gap: PersonaGap;
+};
+
+export type DomainStrength = {
+  name: string;
   rank: number;
-  role: string;
-  fitScore: number;
-  fitTier: FitTier;
-  withinCurrentTrack: boolean;
-  matchReason: string;
-  strengthAlignments: StrengthAlignment[];
-  dayInTheLife: string;
-  growthTip: string;
+  drive: string;
 };
 
-export type OutsideTrackRole = {
+export type DomainMapping = {
+  domain: string;
+  isPrimary: boolean;
+  strengths: DomainStrength[];
+};
+
+export type PerfectFitRole = {
   role: string;
-  fitScore: number;
-  fitTier: FitTier;
-  currentTrack: string;
+  stars: number;
+  why: string;
+  synergy: string;
+  watchOut: string;
+};
+
+export type StretchRole = {
+  role: string;
+  stars: number;
   naturalTrack: string;
-  explanation: string;
+  why: string;
+  timeline: string;
 };
 
-export type StrengthDomains = {
-  executing: string[];
-  influencing: string[];
-  relationshipBuilding: string[];
-  strategicThinking: string[];
-  dominantDomain: string;
-  secondaryDomain: string;
+export type CautionRole = {
+  role: string;
+  stars: number;
+  friction: string;
+  mismatch: string;
 };
 
-export type TeamComplementarity = {
-  yourContribution: string;
-  seekInTeammates: string[];
+export type TeammateStrength = {
+  strength: string;
+  why: string;
+};
+
+export type TeamDynamics = {
+  whatYouBring: string;
+  seekOutTeammatesWith: TeammateStrength[];
   idealTeamComposition: string;
 };
 
-export type DevelopmentItem = {
-  gap: string;
-  risk: string;
-  action: string;
+export type ActionPlan = {
+  immediatePlacement: { role: string; why: string };
+  sixMonthDevelopment: string;
+  blindSpotManagement: string;
+  eighteenMonthTarget: { role: string; requirement: string };
 };
 
 export type AnalysisResult = {
-  strengthDomains: StrengthDomains;
-  topRoleMatches: RoleMatch[];
-  topRolesOutsideTrack: OutsideTrackRole[];
-  teamComplementarity: TeamComplementarity;
-  developmentPlan: DevelopmentItem[];
-  quickSummary: string;
+  persona: Persona;
+  domainMapping: DomainMapping[];
+  perfectFitRoles: PerfectFitRole[];
+  stretchRoles: StretchRole[];
+  cautionRoles: CautionRole[];
+  teamDynamics: TeamDynamics;
+  actionPlan: ActionPlan;
 };
 
 // ─── App State Types ─────────────────────────────────────────────────────────
