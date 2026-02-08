@@ -63,13 +63,15 @@ export default function JoinTeamBanner({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to join team map");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `Server error ${response.status}`);
       }
 
       setIsSuccess(true);
     } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
+      console.error("Join Team Map error:", err);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
