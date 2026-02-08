@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { ACCENTURE_ROLES, TRACKS } from "./accentureRoles";
 import { AnalysisResult, ExtractedStrengths, TrackId } from "./types";
 
@@ -91,10 +91,17 @@ Note: People CAN move between tracks over time, so also flag strong fits outside
 Return the TOP 5 role matches within their track plus the TOP 3 role matches outside their track.
 For each top role match, include 2-4 specific strength alignments with concrete explanations.
 
-IMPORTANT GUIDELINES:
-- "matchReason": A single punchy sentence (max 20 words) explaining WHY this person fits this role, referencing their specific top strengths by name. This is shown as a preview before the user expands details. Example: "Your Strategic and Analytical strengths make you a natural at the high-level decision-making this role demands."
-- "dayInTheLife": Write this as a PERSONALISED strength-based narrative, NOT a generic job description. Describe how THIS person's specific strengths would show up during a typical day. Example: Instead of "You will attend meetings and write documents", write "Your Achiever drive powers you through back-to-back client workshops, while your Deliberative nature ensures every requirement is bulletproof before sign-off."
-- "growthTip": Make this actionable and specific to the person's strength profile.
+VOICE AND TONE — THIS IS THE MOST IMPORTANT INSTRUCTION:
+Write like a smart, warm mentor who's known this person for a while — someone who's direct, occasionally witty, and genuinely insightful. NOT a corporate report. NOT a LinkedIn post. NOT a career brochure.
+
+Rules:
+- Talk TO the person, not ABOUT them. Be conversational.
+- NEVER mechanically list strengths. Weave them into genuine observations and stories.
+- NEVER start sentences with "Your [Strength] strength..." — that's the biggest giveaway of robotic output.
+- Vary rhythm: mix short punchy sentences with longer flowing ones. Each section should feel different.
+- Ban these words: "thrive", "shine", "excel", "leverage", "natural fit", "aligns with", "directly maps to", "positions you well".
+- Be specific. Generic praise is useless. Tell them something about themselves they might not have realised.
+- Write like you're explaining it over coffee, not presenting a slide deck.
 
 Respond ONLY in valid JSON. No markdown, no backticks, no preamble.
 
@@ -114,15 +121,15 @@ Respond ONLY in valid JSON. No markdown, no backticks, no preamble.
       "fitScore": 92,
       "fitTier": "Exceptional Fit",
       "withinCurrentTrack": true,
-      "matchReason": "Your Strategic and Communication strengths are the exact combination that makes a BA thrive in client-facing analysis.",
+      "matchReason": "The way you cut through complexity and pull out what actually matters? That's the entire BA job in one sentence.",
       "strengthAlignments": [
         {
           "strength": "Strategic",
-          "relevance": "Your Strategic strength directly maps to the BA's core task of translating complex business problems into structured requirements. You'll naturally see patterns in client needs that others miss."
+          "relevance": "Here's the thing about BAs — most people in the role can gather requirements just fine. What separates the great ones is seeing the patterns underneath. When a client describes five separate pain points, you're the person who spots that they're all symptoms of one root cause. That's Strategic thinking doing its thing, and it's genuinely rare."
         }
       ],
-      "dayInTheLife": "Your mornings start in client workshops where your Communication strength shines — drawing out requirements others miss. Afternoons, your Strategic thinking kicks in as you translate messy conversations into crisp user stories and process maps. Your Analytical side ensures every edge case is covered before you present to the delivery team.",
-      "growthTip": "Pair your Strategic thinking with formal BA frameworks like MoSCoW prioritisation and BPMN process modelling to add structure to your natural instincts."
+      "dayInTheLife": "Picture this: you walk into a client workshop and the room is chaos — fifteen stakeholders, all with conflicting priorities. Most people freeze up. But something clicks for you. Within twenty minutes you've mapped out who actually cares about what, found the three things everyone secretly agrees on, and sketched a way forward on the whiteboard. By lunch you've turned a two-hour argument into a clean set of requirements. The afternoon is the quieter part — working through edge cases, pressure-testing your own logic, making sure nothing's been glossed over. That's where the Analytical side of your brain earns its keep.",
+      "growthTip": "Real talk: you're great at seeing the big picture, but sometimes you might skip the tedious documentation step because you've already moved on mentally. Force yourself to write things down in detail early on — MoSCoW prioritisation and proper acceptance criteria. It'll feel slow, but it saves you from having the same conversation three times."
     }
   ],
   "topRolesOutsideTrack": [
@@ -132,22 +139,22 @@ Respond ONLY in valid JSON. No markdown, no backticks, no preamble.
       "fitTier": "Strong Fit",
       "currentTrack": "Tech Transformation",
       "naturalTrack": "Tech Delivery / Tech Transformation",
-      "explanation": "Your Strategic and Command strengths are a natural fit for Product Owner, which requires decisive prioritisation and vision-setting. This could be a growth path after 18-24 months."
+      "explanation": "This one's interesting — Product Owner isn't on your current track, but honestly? The way you think about priorities and trade-offs is exactly what PO work demands. Someone with Command and Strategic in their top strengths doesn't just manage a backlog, they own the vision. Worth exploring after a year or two of BA experience."
     }
   ],
   "teamComplementarity": {
-    "yourContribution": "You bring strategic direction, clear communication, and stakeholder management to any team.",
-    "seekInTeammates": ["Achiever (execution horsepower)", "Analytical (data rigour)", "Restorative (debugging and problem-fixing)"],
-    "idealTeamComposition": "Your strengths are strongest in a team that has strong Executing-domain members to complement your Strategic Thinking and Influencing focus."
+    "yourContribution": "You're the person who walks into a muddled discussion and says 'okay, here's what we're actually trying to solve.' That clarity is rare and teams lean on it more than you probably realise.",
+    "seekInTeammates": ["Someone with Achiever energy who'll power through the execution grind you find draining", "An Analytical mind to challenge your intuitions with hard data", "A Restorative thinker who loves debugging the things that make you impatient"],
+    "idealTeamComposition": "You need builders around you. You're the one who sees the destination clearly — but you need teammates who love the journey of actually constructing it. Heavy Executing-domain people are your perfect complement."
   },
   "developmentPlan": [
     {
-      "gap": "Limited Executing-domain strengths",
-      "risk": "May struggle with sustained hands-on delivery grind",
-      "action": "Build personal systems and checklists to compensate. Volunteer for delivery-heavy sprints early to build the muscle."
+      "gap": "Not much Executing-domain firepower in your top strengths",
+      "risk": "When a project hits the boring middle — the grind phase where it's just heads-down delivery — you might lose energy or start mentally jumping to the next thing before this one's done.",
+      "action": "Build yourself a personal system: checklists, time-blocks, weekly reviews. These aren't exciting, but they're the scaffolding that lets your Strategic brain operate without dropping balls. Also: volunteer for at least one delivery-heavy sprint early in your career. It'll be uncomfortable, but you'll understand what your execution-focused teammates deal with daily."
     }
   ],
-  "quickSummary": "Your top 5 strengths strongly position you for client-facing, strategy-oriented roles. Your #1 match is Business Analyst within your Tech Transformation track, with Product Owner and Scrum Master as strong secondary fits."
+  "quickSummary": "You're a big-picture thinker with serious communication chops. Business Analyst is the obvious starting point on your track — it's basically designed for how your brain works. But keep an eye on Product Owner and Solution Architect as you grow."
 }`;
 
 export async function analyzeStrengths(
@@ -161,15 +168,7 @@ export async function analyzeStrengths(
     );
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3-pro-preview",
-    generationConfig: {
-      temperature: 1,
-      maxOutputTokens: 40000,
-      responseMimeType: "application/json",
-    },
-  });
+  const ai = new GoogleGenAI({ apiKey });
 
   const track = TRACKS[trackId];
   if (!track) {
@@ -207,17 +206,18 @@ export async function analyzeStrengths(
     );
   }
 
-  const result = await model.generateContent({
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage }],
-      },
-    ],
+  const result = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
+    config: {
+      temperature: 1,
+      maxOutputTokens: 40000,
+      responseMimeType: "application/json",
+      tools: [{ googleSearch: {} }],
+    },
   });
 
-  const response = result.response;
-  const text = response.text();
+  const text = result.text;
 
   if (!text) {
     throw new Error("Empty response from AI. Please try again.");
