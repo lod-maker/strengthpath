@@ -207,7 +207,7 @@ export async function analyzeStrengths(
   }
 
   const result = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-pro-preview",
     contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
     config: {
       temperature: 1,
