@@ -105,7 +105,7 @@ Note: People CAN move between tracks over time. Flag strong fits outside the cur
 
 YOUR TASK
 
-Analyze this person's strengths against the roles above. Be exhaustive. Every text field in the JSON is free-form and should be LONG — write full multi-paragraph essays, not sentences. The more detail, context, examples, and insight you provide, the better. You have virtually unlimited space, so use it. Go deep on every field.
+Analyze this person's strengths against the roles above. Address the candidate by their first name throughout the analysis to make it personal (e.g., "Michele, your Strategic combined with..."). Be exhaustive. Every text field in the JSON is free-form and should be LONG — write full multi-paragraph essays, not sentences. The more detail, context, examples, and insight you provide, the better. You have virtually unlimited space, so use it. Go deep on every field.
 
 For EVERY role (perfectFitRoles, stretchRoles, AND cautionRoles), you MUST include a "dayInTheLife" field: a vivid, immersive, multi-paragraph narrative written in second person ("You walk into the office...") that paints a picture of what a typical day looks like for THIS specific candidate in THIS role given their unique strengths profile. Make it concrete — mention meetings, tasks, interactions, challenges, and moments where their strengths shine (or struggle, for caution roles). This should read like a story, not a job description.
 
@@ -125,7 +125,8 @@ Respond ONLY in valid JSON matching this shape:
 
 export async function analyzeStrengths(
   strengths: ExtractedStrengths,
-  trackId: TrackId
+  trackId: TrackId,
+  candidateName: string = "Candidate"
 ): Promise<AnalysisResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -152,6 +153,8 @@ export async function analyzeStrengths(
   }).join("\n");
 
   const userMessage = [
+    "Candidate Name: " + candidateName,
+    "",
     "My CliftonStrengths (ranked):",
     strengthsText,
     "",

@@ -22,16 +22,17 @@ import {
 
 export default function AnalyzePage() {
   const [step, setStep] = useState<AppStep>("upload");
+  const [candidateName, setCandidateName] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<TrackId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [strengths, setStrengths] = useState<ExtractedStrengths | null>(null);
 
-  const canAnalyze = file !== null && selectedTrack !== null;
+  const canAnalyze = candidateName.trim().length > 0 && file !== null && selectedTrack !== null;
 
   const handleAnalyze = useCallback(async () => {
-    if (!file || !selectedTrack) return;
+    if (!file || !selectedTrack || !candidateName.trim()) return;
 
     setError(null);
     setStep("loading");
@@ -40,6 +41,7 @@ export default function AnalyzePage() {
       const formData = new FormData();
       formData.append("pdf", file);
       formData.append("trackId", selectedTrack);
+      formData.append("candidateName", candidateName.trim());
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -66,7 +68,7 @@ export default function AnalyzePage() {
       setError(message);
       setStep("upload");
     }
-  }, [file, selectedTrack]);
+  }, [file, selectedTrack, candidateName]);
 
   const handleReset = useCallback(() => {
     setStep("upload");
@@ -179,6 +181,25 @@ export default function AnalyzePage() {
                 </motion.div>
               )}
 
+              {/* Your Name */}
+              <section>
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-white">
+                    Your Name
+                  </h2>
+                  <p className="text-gray-400 mt-1">
+                    This personalises your report.
+                  </p>
+                </div>
+                <input
+                  type="text"
+                  value={candidateName}
+                  onChange={(e) => setCandidateName(e.target.value)}
+                  placeholder="e.g. Michele Lodetti"
+                  className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/25 transition-colors"
+                />
+              </section>
+
               {/* Step 1: Upload */}
               <section>
                 <div className="mb-6">
@@ -225,7 +246,9 @@ export default function AnalyzePage() {
 
               {!canAnalyze && (
                 <p className="text-center text-sm text-gray-500">
-                  {!file && !selectedTrack
+                  {!candidateName.trim()
+                    ? "Enter your name to get started"
+                    : !file && !selectedTrack
                     ? "Upload your PDF and select your track to begin"
                     : !file
                     ? "Upload your CliftonStrengths PDF to continue"
@@ -260,6 +283,7 @@ export default function AnalyzePage() {
               <ResultsDashboard
                 analysis={analysis}
                 trackId={selectedTrack}
+                candidateName={candidateName}
                 onReset={handleReset}
               />
             </motion.div>

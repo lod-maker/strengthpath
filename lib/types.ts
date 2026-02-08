@@ -124,6 +124,16 @@ export type AnalysisResult = {
   actionPlan: ActionPlan;
 };
 
+// ─── Session Result (future-proofed for Team Builder) ───────────────────────
+
+export type SessionResult = {
+  name: string;
+  trackId: TrackId;
+  strengths: ExtractedStrengths;
+  analysis: AnalysisResult;
+  timestamp: string;
+};
+
 // ─── App State Types ─────────────────────────────────────────────────────────
 
 export type AppStep = "upload" | "loading" | "results";

@@ -27,6 +27,7 @@ import {
 interface ResultsDashboardProps {
   analysis: AnalysisResult;
   trackId: TrackId;
+  candidateName: string;
   onReset: () => void;
 }
 
@@ -97,6 +98,7 @@ function ExpandableCard({
 export default function ResultsDashboard({
   analysis,
   trackId,
+  candidateName,
   onReset,
 }: ResultsDashboardProps) {
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -138,12 +140,27 @@ export default function ResultsDashboard({
     <div ref={dashboardRef} className="space-y-8">
 
       {/* ═══════════════════════════════════════════════════════════════════════
+          REPORT HEADER
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-center"
+      >
+        <h1 className="text-2xl md:text-3xl font-bold text-white">
+          {candidateName}&apos;s StrengthPath Report
+        </h1>
+        <p className="text-sm text-gray-400 mt-1">{track.title} Track</p>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
           EXECUTIVE SUMMARY / PERSONA
       ═══════════════════════════════════════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.4, delay: 0.05 }}
         className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent/5 p-8"
       >
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">

@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("pdf") as File | null;
     const trackId = formData.get("trackId") as string | null;
+    const candidateName = (formData.get("candidateName") as string | null) || "Candidate";
 
     // Validate inputs
     if (!file) {
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Step 2: Analyze with Claude against all 27 roles
     let analysis;
     try {
-      analysis = await analyzeStrengths(strengths, trackId as TrackId);
+      analysis = await analyzeStrengths(strengths, trackId as TrackId, candidateName);
     } catch (err) {
       const message =
         err instanceof Error
