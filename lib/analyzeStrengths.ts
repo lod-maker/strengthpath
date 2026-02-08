@@ -116,7 +116,8 @@ CRITICAL INSTRUCTIONS:
 5. Star ratings must be justified. Don't give 5 stars unless the match is exceptional across multiple dimensions.
 6. Use your expertise to determine which strengths each role demands and which bottom-ranked strengths would be red flags. Base this on the role descriptions, not on hardcoded lists.
 7. Track filtering: Perfect Fit roles MUST come from the candidate's selected track. Stretch roles should come from other tracks.
-8. You MUST return exactly 6-7 Perfect Fit roles in the perfectFitRoles array. Not 3, not 4 — always 6 or 7.
+8. You MUST return exactly 9 roles in the perfectFitRoles array. Each role gets a star rating (1-5) based on actual fit — not every role needs to be 4 or 5 stars. Be honest.
+9. You MUST return at least 4 roles in the cautionRoles array. These are roles within or near the track that would drain or frustrate this person.
 9. Be direct and specific. No corporate fluff. Write like a coach who genuinely wants this person to succeed.
 
 ---
