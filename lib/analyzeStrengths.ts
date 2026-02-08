@@ -105,16 +105,20 @@ Note: People CAN move between tracks over time. Flag strong fits outside the cur
 
 YOUR TASK
 
-Analyze this person's strengths against the roles above. Write as much as you need — be thorough, honest, and insightful. Every text field below is free-form: write full paragraphs, not bullet points or single sentences. Go deep. Return 9 perfectFitRoles, at least 4 cautionRoles, and 2-3 stretchRoles.
+Analyze this person's strengths against the roles above. Be exhaustive. Every text field in the JSON is free-form and should be LONG — write full multi-paragraph essays, not sentences. The more detail, context, examples, and insight you provide, the better. You have virtually unlimited space, so use it. Go deep on every field.
+
+For EVERY role (perfectFitRoles, stretchRoles, AND cautionRoles), you MUST include a "dayInTheLife" field: a vivid, immersive, multi-paragraph narrative written in second person ("You walk into the office...") that paints a picture of what a typical day looks like for THIS specific candidate in THIS role given their unique strengths profile. Make it concrete — mention meetings, tasks, interactions, challenges, and moments where their strengths shine (or struggle, for caution roles). This should read like a story, not a job description.
+
+Return 9 perfectFitRoles, at least 4 cautionRoles, and 2-3 stretchRoles.
 
 Respond ONLY in valid JSON matching this shape:
 
 {
   "persona": { "moniker": "", "narrative": "", "topFive": [], "dominantDomain": { "name": "", "description": "" }, "secondaryDomain": { "name": "", "description": "" }, "gap": { "domain": "", "description": "" } },
   "domainMapping": [{ "domain": "", "isPrimary": false, "strengths": [{ "name": "", "rank": 0, "drive": "" }] }],
-  "perfectFitRoles": [{ "role": "", "stars": 0, "why": "", "synergy": "", "watchOut": "" }],
-  "stretchRoles": [{ "role": "", "stars": 0, "naturalTrack": "", "why": "", "timeline": "" }],
-  "cautionRoles": [{ "role": "", "stars": 0, "friction": "", "mismatch": "" }],
+  "perfectFitRoles": [{ "role": "", "stars": 0, "why": "", "synergy": "", "watchOut": "", "dayInTheLife": "" }],
+  "stretchRoles": [{ "role": "", "stars": 0, "naturalTrack": "", "why": "", "timeline": "", "dayInTheLife": "" }],
+  "cautionRoles": [{ "role": "", "stars": 0, "friction": "", "mismatch": "", "dayInTheLife": "" }],
   "teamDynamics": { "whatYouBring": "", "seekOutTeammatesWith": [{ "strength": "", "why": "" }], "idealTeamComposition": "" },
   "actionPlan": { "immediatePlacement": { "role": "", "why": "" }, "sixMonthDevelopment": "", "blindSpotManagement": "", "eighteenMonthTarget": { "role": "", "requirement": "" } }
 }`;
@@ -169,7 +173,7 @@ export async function analyzeStrengths(
     contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
     config: {
       temperature: 1,
-      maxOutputTokens: 60000,
+      maxOutputTokens: 130000,
       responseMimeType: "application/json",
     },
   });

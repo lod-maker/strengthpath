@@ -76,6 +76,7 @@ export type PerfectFitRole = {
   why: string;
   synergy: string;
   watchOut: string;
+  dayInTheLife: string;
 };
 
 export type StretchRole = {
@@ -84,6 +85,7 @@ export type StretchRole = {
   naturalTrack: string;
   why: string;
   timeline: string;
+  dayInTheLife: string;
 };
 
 export type CautionRole = {
@@ -91,6 +93,7 @@ export type CautionRole = {
   stars: number;
   friction: string;
   mismatch: string;
+  dayInTheLife: string;
 };
 
 export type TeammateStrength = {
