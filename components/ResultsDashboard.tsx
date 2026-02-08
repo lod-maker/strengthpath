@@ -55,10 +55,10 @@ function Stars({ count }: { count: number }) {
 
 function getDomainColor(domain: string): string {
   const d = domain.toLowerCase();
-  if (d.includes("executing")) return "#10B981";
-  if (d.includes("influencing")) return "#8B5CF6";
-  if (d.includes("relationship")) return "#F59E0B";
-  if (d.includes("strategic")) return "#3B82F6";
+  if (d.includes("executing")) return "#3B82F6";
+  if (d.includes("influencing")) return "#F59E0B";
+  if (d.includes("relationship")) return "#10B981";
+  if (d.includes("strategic")) return "#8B5CF6";
   return "#9CA3AF";
 }
 

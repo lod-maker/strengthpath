@@ -31,13 +31,13 @@ export function getDomainForStrength(strengthName: string): string {
 export function getDomainColor(domain: string): string {
   switch (domain) {
     case "Executing":
-      return "#7B2D8E";
+      return "#3B82F6";
     case "Influencing":
-      return "#E8A838";
+      return "#F59E0B";
     case "Relationship Building":
-      return "#2E86AB";
+      return "#10B981";
     case "Strategic Thinking":
-      return "#28A745";
+      return "#8B5CF6";
     default:
       return "#6B7280";
   }
