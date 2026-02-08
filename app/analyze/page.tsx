@@ -54,7 +54,15 @@ export default function AnalyzePage() {
         body: formData,
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        // Server returned non-JSON (e.g. Vercel timeout or gateway error)
+        throw new Error(
+          "The analysis timed out or the server returned an unexpected response. Please try again."
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Analysis failed. Please try again.");

@@ -167,17 +167,35 @@ export async function analyzeStrengths(
     );
   }
 
-  const result = await ai.models.generateContent({
-    model: "gemini-3-pro-preview",
-    contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
-    config: {
-      temperature: 1,
-      maxOutputTokens: 60000,
-      responseMimeType: "application/json",
-    },
-  });
+  // Retry up to 2 times on transient Gemini failures
+  let text: string | undefined;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const result = await ai.models.generateContent({
+        model: "gemini-3-pro-preview",
+        contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
+        config: {
+          temperature: 1,
+          maxOutputTokens: 60000,
+          responseMimeType: "application/json",
+        },
+      });
+      text = result.text;
+      if (text) break;
+    } catch (err) {
+      lastError = err;
+      if (attempt < 1) {
+        // Wait 2s before retry
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+    }
+  }
 
-  const text = result.text;
+  if (!text && lastError) {
+    throw lastError;
+  }
 
   if (!text) {
     throw new Error("Empty response from AI. Please try again.");
