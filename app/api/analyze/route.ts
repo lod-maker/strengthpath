@@ -14,9 +14,16 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("pdf") as File | null;
     const trackId = formData.get("trackId") as string | null;
-    const candidateName = (formData.get("candidateName") as string | null) || "Candidate";
+    const name = (formData.get("name") as string | null)?.trim() || "";
 
     // Validate inputs
+    if (!name) {
+      return NextResponse.json(
+        { error: "Please enter your name." },
+        { status: 400 }
+      );
+    }
+
     if (!file) {
       return NextResponse.json(
         { error: "No PDF file uploaded." },
@@ -75,7 +82,7 @@ export async function POST(request: NextRequest) {
     // Step 2: Analyze with Claude against all 27 roles
     let analysis;
     try {
-      analysis = await analyzeStrengths(strengths, trackId as TrackId, candidateName);
+      analysis = await analyzeStrengths(strengths, trackId as TrackId, name);
     } catch (err) {
       const message =
         err instanceof Error
@@ -97,6 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
+      name,
       strengths,
       analysis,
     });

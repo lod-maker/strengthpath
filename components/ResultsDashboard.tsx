@@ -21,13 +21,12 @@ import {
   Target,
   ShieldAlert,
   Brain,
-  Sun,
 } from "lucide-react";
 
 interface ResultsDashboardProps {
   analysis: AnalysisResult;
   trackId: TrackId;
-  candidateName: string;
+  userName: string;
   onReset: () => void;
 }
 
@@ -98,7 +97,7 @@ function ExpandableCard({
 export default function ResultsDashboard({
   analysis,
   trackId,
-  candidateName,
+  userName,
   onReset,
 }: ResultsDashboardProps) {
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -142,17 +141,12 @@ export default function ResultsDashboard({
       {/* ═══════════════════════════════════════════════════════════════════════
           REPORT HEADER
       ═══════════════════════════════════════════════════════════════════════ */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="text-center"
-      >
-        <h1 className="text-2xl md:text-3xl font-bold text-white">
-          {candidateName}&apos;s StrengthPath Report
+      <div className="text-center space-y-1">
+        <h1 className="text-3xl md:text-4xl font-bold text-white">
+          {userName}&apos;s StrengthPath Report
         </h1>
-        <p className="text-sm text-gray-400 mt-1">{track.title} Track</p>
-      </motion.div>
+        <p className="text-sm text-gray-500">{track.title} Track</p>
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
           EXECUTIVE SUMMARY / PERSONA
@@ -160,7 +154,7 @@ export default function ResultsDashboard({
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.05 }}
+        transition={{ duration: 0.4 }}
         className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent/5 p-8"
       >
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
@@ -320,15 +314,6 @@ export default function ResultsDashboard({
                 </div>
                 <p className="text-sm text-gray-300 leading-relaxed">{role.watchOut}</p>
               </div>
-              {role.dayInTheLife && (
-                <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sun className="w-4 h-4 text-purple-400" />
-                    <p className="text-sm font-medium text-purple-400">A Day in the Life</p>
-                  </div>
-                  <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{role.dayInTheLife}</p>
-                </div>
-              )}
             </ExpandableCard>
           ))}
         </div>
@@ -352,38 +337,25 @@ export default function ResultsDashboard({
           </p>
           <div className="space-y-3">
             {stretchRoles.map((role: StretchRole) => (
-              <ExpandableCard
+              <div
                 key={role.role}
-                header={
-                  <div className="flex items-center justify-between gap-3 w-full">
-                    <div>
-                      <h4 className="text-base font-semibold text-white">{role.role}</h4>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        via {role.naturalTrack}
-                      </p>
-                    </div>
-                    <Stars count={role.stars} />
-                  </div>
-                }
+                className="rounded-2xl border border-border bg-surface p-5 space-y-3"
               >
-                <div className="rounded-xl bg-surface-light p-4">
-                  <p className="text-sm font-medium text-accent mb-1">Why This Role</p>
-                  <p className="text-sm text-gray-300 leading-relaxed">{role.why}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-base font-semibold text-white">{role.role}</h4>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      via {role.naturalTrack}
+                    </p>
+                  </div>
+                  <Stars count={role.stars} />
                 </div>
+                <p className="text-sm text-gray-300 leading-relaxed">{role.why}</p>
                 <div className="flex items-center gap-2">
                   <Target className="w-3.5 h-3.5 text-accent" />
                   <span className="text-xs text-accent font-medium">{role.timeline}</span>
                 </div>
-                {role.dayInTheLife && (
-                  <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sun className="w-4 h-4 text-purple-400" />
-                      <p className="text-sm font-medium text-purple-400">A Day in the Life</p>
-                    </div>
-                    <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{role.dayInTheLife}</p>
-                  </div>
-                )}
-              </ExpandableCard>
+              </div>
             ))}
           </div>
         </motion.section>
@@ -407,33 +379,23 @@ export default function ResultsDashboard({
           </p>
           <div className="space-y-3">
             {cautionRoles.map((role: CautionRole) => (
-              <ExpandableCard
+              <div
                 key={role.role}
-                header={
-                  <div className="flex items-center justify-between gap-3 w-full">
-                    <h4 className="text-base font-semibold text-white">{role.role}</h4>
-                    <Stars count={role.stars} />
-                  </div>
-                }
+                className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-3"
               >
-                <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h4 className="text-base font-semibold text-white">{role.role}</h4>
+                  <Stars count={role.stars} />
+                </div>
+                <div>
                   <p className="text-xs font-medium text-amber-400 uppercase tracking-wider mb-1">The Friction</p>
                   <p className="text-sm text-gray-300 leading-relaxed">{role.friction}</p>
                 </div>
-                <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-4">
+                <div>
                   <p className="text-xs font-medium text-amber-400 uppercase tracking-wider mb-1">The Mismatch</p>
                   <p className="text-sm text-gray-300 leading-relaxed">{role.mismatch}</p>
                 </div>
-                {role.dayInTheLife && (
-                  <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sun className="w-4 h-4 text-purple-400" />
-                      <p className="text-sm font-medium text-purple-400">A Day in the Life</p>
-                    </div>
-                    <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{role.dayInTheLife}</p>
-                  </div>
-                )}
-              </ExpandableCard>
+              </div>
             ))}
           </div>
         </motion.section>

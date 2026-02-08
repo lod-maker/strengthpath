@@ -22,17 +22,17 @@ import {
 
 export default function AnalyzePage() {
   const [step, setStep] = useState<AppStep>("upload");
-  const [candidateName, setCandidateName] = useState("");
+  const [userName, setUserName] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<TrackId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [strengths, setStrengths] = useState<ExtractedStrengths | null>(null);
 
-  const canAnalyze = candidateName.trim().length > 0 && file !== null && selectedTrack !== null;
+  const canAnalyze = file !== null && selectedTrack !== null && userName.trim().length > 0;
 
   const handleAnalyze = useCallback(async () => {
-    if (!file || !selectedTrack || !candidateName.trim()) return;
+    if (!file || !selectedTrack || !userName.trim()) return;
 
     setError(null);
     setStep("loading");
@@ -41,19 +41,14 @@ export default function AnalyzePage() {
       const formData = new FormData();
       formData.append("pdf", file);
       formData.append("trackId", selectedTrack);
-      formData.append("candidateName", candidateName.trim());
+      formData.append("name", userName.trim());
 
       const response = await fetch("/api/analyze", {
         method: "POST",
         body: formData,
       });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error("The analysis took too long or the server returned an invalid response. Please try again.");
-      }
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "Analysis failed. Please try again.");
@@ -68,7 +63,7 @@ export default function AnalyzePage() {
       setError(message);
       setStep("upload");
     }
-  }, [file, selectedTrack, candidateName]);
+  }, [file, selectedTrack, userName]);
 
   const handleReset = useCallback(() => {
     setStep("upload");
@@ -181,30 +176,30 @@ export default function AnalyzePage() {
                 </motion.div>
               )}
 
-              {/* Your Name */}
+              {/* Step 1: Your Name */}
               <section>
                 <div className="mb-4">
                   <h2 className="text-2xl font-bold text-white">
-                    Your Name
+                    Step 1: Your name
                   </h2>
                   <p className="text-gray-400 mt-1">
-                    This personalises your report.
+                    So we can personalise your report.
                   </p>
                 </div>
                 <input
                   type="text"
-                  value={candidateName}
-                  onChange={(e) => setCandidateName(e.target.value)}
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   placeholder="e.g. Michele Lodetti"
-                  className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/25 transition-colors"
+                  className="w-full max-w-md rounded-xl bg-surface border border-border px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/30 transition-colors"
                 />
               </section>
 
-              {/* Step 1: Upload */}
+              {/* Step 2: Upload */}
               <section>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white">
-                    Step 1: Upload your report
+                    Step 2: Upload your report
                   </h2>
                   <p className="text-gray-400 mt-1">
                     Upload the PDF you received from the Gallup CliftonStrengths
@@ -214,11 +209,11 @@ export default function AnalyzePage() {
                 <UploadZone file={file} onFileSelect={setFile} />
               </section>
 
-              {/* Step 2: Select Track */}
+              {/* Step 3: Select Track */}
               <section>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white">
-                    Step 2: Which track were you hired into?
+                    Step 3: Which track were you hired into?
                   </h2>
                   <p className="text-gray-400 mt-1">
                     We&apos;ll analyze your strengths against all 27 roles, prioritising
@@ -246,7 +241,7 @@ export default function AnalyzePage() {
 
               {!canAnalyze && (
                 <p className="text-center text-sm text-gray-500">
-                  {!candidateName.trim()
+                  {!userName.trim()
                     ? "Enter your name to get started"
                     : !file && !selectedTrack
                     ? "Upload your PDF and select your track to begin"
@@ -283,7 +278,7 @@ export default function AnalyzePage() {
               <ResultsDashboard
                 analysis={analysis}
                 trackId={selectedTrack}
-                candidateName={candidateName}
+                userName={userName}
                 onReset={handleReset}
               />
             </motion.div>

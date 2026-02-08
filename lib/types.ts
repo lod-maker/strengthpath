@@ -76,7 +76,6 @@ export type PerfectFitRole = {
   why: string;
   synergy: string;
   watchOut: string;
-  dayInTheLife: string;
 };
 
 export type StretchRole = {
@@ -85,7 +84,6 @@ export type StretchRole = {
   naturalTrack: string;
   why: string;
   timeline: string;
-  dayInTheLife: string;
 };
 
 export type CautionRole = {
@@ -93,7 +91,6 @@ export type CautionRole = {
   stars: number;
   friction: string;
   mismatch: string;
-  dayInTheLife: string;
 };
 
 export type TeammateStrength = {
@@ -124,11 +121,11 @@ export type AnalysisResult = {
   actionPlan: ActionPlan;
 };
 
-// ─── Session Result (future-proofed for Team Builder) ───────────────────────
+// ─── Session Result (future Team Builder support) ───────────────────────────
 
 export type SessionResult = {
   name: string;
-  trackId: TrackId;
+  track: TrackId;
   strengths: ExtractedStrengths;
   analysis: AnalysisResult;
   timestamp: string;
