@@ -34,7 +34,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           <Link href="/team">
             <Button variant="ghost" size="sm">
-              Team Map
+              Team Map <span className="text-accent/60 text-xs ml-1">(beta)</span>
             </Button>
           </Link>
           <Link href="/analyze">
@@ -72,7 +72,7 @@ export default function LandingPage() {
 
           <p className="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Upload your CliftonStrengths report, select your analyst track, and
-            discover which of Accenture&apos;s 27 technology roles are the best
+            discover which of Accenture&apos;s 28 technology roles are the best
             fit for your unique strength profile.
           </p>
 
@@ -109,8 +109,8 @@ export default function LandingPage() {
             },
             {
               icon: <BarChart3 className="w-6 h-6" />,
-              title: "27-Role Matching",
-              desc: "AI scores your strengths against all 27 Accenture technology roles and ranks your best fits.",
+              title: "28-Role Matching",
+              desc: "AI scores your strengths against all 28 Accenture technology roles and ranks your best fits.",
             },
             {
               icon: <Users className="w-6 h-6" />,
@@ -151,7 +151,7 @@ export default function LandingPage() {
           className="mt-20 text-center max-w-3xl mx-auto"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Three tracks. 27 roles. Your perfect fit.
+            Three tracks. 28 roles. Your perfect fit.
           </h2>
           <p className="text-gray-400 mb-10">
             Select your analyst track and discover which specific roles match

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseGallupPDF } from "@/lib/parseGallupPDF";
+import { extractStrengthsViaVision } from "@/lib/extractStrengthsVision";
 import { analyzeStrengths } from "@/lib/analyzeStrengths";
 import { TrackId } from "@/lib/types";
 
@@ -45,29 +46,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Parse PDF in an isolated scope — buffer is discarded immediately
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Step 1: Extract strengths — try vision first, fall back to text parsing
     let strengths;
     let extractedName = "";
-    {
-      const buffer = Buffer.from(await file.arrayBuffer());
+    let visionUsed = false;
+
+    try {
+      const visionResult = await extractStrengthsViaVision(buffer);
+      strengths = visionResult.strengths;
+      extractedName = visionResult.extractedName;
+      visionUsed = true;
+    } catch (visionErr) {
+      console.warn(
+        "Vision extraction failed, falling back to text parsing:",
+        visionErr instanceof Error ? visionErr.message : visionErr
+      );
+
+      // Fallback to text-based parsing
       try {
-        const result = await parseGallupPDF(buffer);
-        strengths = result.strengths;
-        extractedName = result.extractedName;
-      } catch (err) {
+        const textResult = await parseGallupPDF(buffer);
+        strengths = textResult.strengths;
+        extractedName = textResult.extractedName;
+      } catch (textErr) {
         const message =
-          err instanceof Error
-            ? err.message
+          textErr instanceof Error
+            ? textErr.message
             : "Failed to parse the PDF. Please check the file and try again.";
         return NextResponse.json({ error: message }, { status: 422 });
       }
-      // buffer goes out of scope here — PDF is gone, eligible for GC
     }
 
     // Use extracted name or fallback to "Team Member"
     const name = extractedName || "Team Member";
 
-    if (strengths.length === 0) {
+    if (!strengths || strengths.length === 0) {
       return NextResponse.json(
         {
           error:
@@ -77,7 +91,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Analyze against all 27 roles (PDF no longer in memory)
+    // Step 2: Analyze against all 28 roles (PDF no longer needed)
     let analysis;
     try {
       analysis = await analyzeStrengths(strengths, trackId as TrackId, name);
@@ -105,6 +119,7 @@ export async function POST(request: NextRequest) {
       name,
       strengths,
       analysis,
+      visionExtraction: visionUsed,
     });
   } catch (err) {
     console.error("Analysis API error:", err);

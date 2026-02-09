@@ -13,6 +13,25 @@ export async function DELETE(
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
+    // Parse requester name from body for ownership verification
+    let requesterName = "";
+    try {
+      const body = await request.json();
+      requesterName = (body.requesterName || "").trim().toLowerCase();
+    } catch {
+      return NextResponse.json(
+        { error: "Request body with requesterName is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!requesterName) {
+      return NextResponse.json(
+        { error: "requesterName is required" },
+        { status: 400 }
+      );
+    }
+
     const members = await getTeamMembers();
     const memberIndex = members.findIndex((m) => m.id === id);
 
@@ -21,6 +40,15 @@ export async function DELETE(
     }
 
     const removedMember = members[memberIndex];
+
+    // Verify ownership — only allow removing yourself
+    if (removedMember.name.trim().toLowerCase() !== requesterName) {
+      return NextResponse.json(
+        { error: "You can only remove yourself from the Team Map" },
+        { status: 403 }
+      );
+    }
+
     members.splice(memberIndex, 1);
     await saveTeamMembers(members);
 

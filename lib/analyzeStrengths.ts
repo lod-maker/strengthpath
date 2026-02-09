@@ -15,7 +15,7 @@ REFERENCE: THE 4 GALLUP DOMAINS
 
 ---
 
-REFERENCE: THE 27 ACCENTURE TECHNOLOGY ROLES
+REFERENCE: THE 28 ACCENTURE TECHNOLOGY ROLES
 
 For each role below, use YOUR expertise as a CliftonStrengths Coach to determine which specific strengths are most critical, which strength combinations create the strongest fit, and which bottom-ranked strengths would be red flags. Base this on the role's actual day-to-day responsibilities described below.
 
@@ -157,7 +157,7 @@ export async function analyzeStrengths(
     "My selected track: " + track.title,
     "Roles accessible from this track: " + track.accessibleRoles.join(", "),
     "",
-    "All 27 roles for reference:",
+    "All 28 roles for reference:",
     rolesText,
   ].join("\n");
 

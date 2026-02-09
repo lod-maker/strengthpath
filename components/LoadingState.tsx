@@ -19,7 +19,7 @@ const PHASES: {
   },
   {
     id: "analyzing",
-    label: "Matching against 27 Accenture roles...",
+    label: "Matching against 28 Accenture roles...",
     icon: <Brain className="w-5 h-5" />,
     duration: 12000,
   },

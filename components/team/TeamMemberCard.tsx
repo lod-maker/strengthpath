@@ -9,6 +9,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 interface TeamMemberCardProps {
   member: TeamMember;
   onRemove?: (id: string) => void;
+  isCurrentUser?: boolean;
 }
 
 const trackColors: Record<string, string> = {
@@ -23,7 +24,7 @@ const trackBadgeColors: Record<string, string> = {
   "Modern Engineering": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
 };
 
-export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, onRemove, isCurrentUser }: TeamMemberCardProps) {
   const [expanded, setExpanded] = React.useState(false);
   const domainColor = getDomainColor(member.dominantDomain);
   const trackGradient = trackColors[member.track] || "from-gray-500/20 to-gray-600/10 border-gray-500/30";
@@ -49,8 +50,11 @@ export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3 mt-1">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-white truncate">{member.name}</h3>
-          <p className="text-sm text-accent font-medium">{member.persona}</p>
+          <h3 className="text-xl font-bold text-white truncate">
+            {member.name}
+            {isCurrentUser && <span className="ml-1.5 text-xs text-yellow-400">&#11088; You</span>}
+          </h3>
+          <p className="text-xs text-gray-400 italic">{member.persona}</p>
         </div>
         <span className={`text-[10px] font-medium px-2 py-1 rounded-full border ${trackBadge}`}>
           {member.track}
@@ -136,13 +140,15 @@ export default function TeamMemberCard({ member, onRemove }: TeamMemberCardProps
         </div>
       )}
 
-      {/* Remove link — always visible on mobile, hover on desktop */}
-      <button
-        onClick={handleRemove}
-        className="absolute bottom-3 right-3 text-[10px] text-gray-500 hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-      >
-        Remove me
-      </button>
+      {/* Remove link — only visible for the current user */}
+      {isCurrentUser && (
+        <button
+          onClick={handleRemove}
+          className="absolute bottom-3 right-3 text-[10px] text-gray-500 hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+        >
+          Remove me
+        </button>
+      )}
     </div>
   );
 }

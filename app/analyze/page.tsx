@@ -208,7 +208,7 @@ export default function AnalyzePage() {
           {/* Team Map link */}
           <Link href="/team" className="hidden sm:block">
             <Button variant="ghost" size="sm">
-              Team Map
+              Team Map <span className="text-accent/60 text-xs ml-1">(beta)</span>
             </Button>
           </Link>
         </div>
@@ -263,7 +263,7 @@ export default function AnalyzePage() {
                     Step 2: Which track were you hired into?
                   </h2>
                   <p className="text-gray-400 mt-1">
-                    We&apos;ll analyze your strengths against all 27 roles, prioritising
+                    We&apos;ll analyze your strengths against all 28 roles, prioritising
                     those accessible from your track.
                   </p>
                 </div>

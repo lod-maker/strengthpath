@@ -74,6 +74,14 @@ export default function JoinTeamBanner({
         throw new Error(data.error || `Server error ${response.status}`);
       }
 
+      // Save identity to localStorage for "Find Me" on Team Map
+      try {
+        localStorage.setItem(
+          "strengthpath_user",
+          JSON.stringify({ name: name.trim(), track: trackTitle })
+        );
+      } catch {}
+
       setIsSuccess(true);
     } catch (err) {
       console.error("Join Team Map error:", err);
