@@ -48,33 +48,41 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Step 1: Extract strengths — try vision first, fall back to text parsing
+    // Step 1: Extract strengths — try fast text parsing first, fall back to vision
     let strengths;
     let extractedName = "";
     let visionUsed = false;
 
     try {
-      const visionResult = await extractStrengthsViaVision(buffer);
-      strengths = visionResult.strengths;
-      extractedName = visionResult.extractedName;
-      visionUsed = true;
-    } catch (visionErr) {
+      const textResult = await parseGallupPDF(buffer);
+      strengths = textResult.strengths;
+      extractedName = textResult.extractedName;
+    } catch (textErr) {
       console.warn(
-        "Vision extraction failed, falling back to text parsing:",
-        visionErr instanceof Error ? visionErr.message : visionErr
+        "Text parsing failed, trying vision extraction:",
+        textErr instanceof Error ? textErr.message : textErr
       );
+    }
 
-      // Fallback to text-based parsing
+    // If text parsing found fewer than 5 strengths, try vision extraction
+    if (!strengths || strengths.length < 5) {
       try {
-        const textResult = await parseGallupPDF(buffer);
-        strengths = textResult.strengths;
-        extractedName = textResult.extractedName;
-      } catch (textErr) {
-        const message =
-          textErr instanceof Error
-            ? textErr.message
-            : "Failed to parse the PDF. Please check the file and try again.";
-        return NextResponse.json({ error: message }, { status: 422 });
+        const visionResult = await extractStrengthsViaVision(buffer);
+        strengths = visionResult.strengths;
+        extractedName = visionResult.extractedName || extractedName;
+        visionUsed = true;
+      } catch (visionErr) {
+        console.warn(
+          "Vision extraction also failed:",
+          visionErr instanceof Error ? visionErr.message : visionErr
+        );
+        // If we have no strengths at all from either method, fail
+        if (!strengths || strengths.length === 0) {
+          return NextResponse.json(
+            { error: "Failed to parse the PDF. Please check the file and try again." },
+            { status: 422 }
+          );
+        }
       }
     }
 

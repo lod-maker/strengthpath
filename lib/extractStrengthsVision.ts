@@ -68,39 +68,32 @@ export async function extractStrengthsViaVision(
   let text: string | undefined;
   let lastError: unknown;
 
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const result = await ai.models.generateContent({
-        model: "gemini-3-pro-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  mimeType: "application/pdf",
-                  data: pdfBase64,
-                },
+  try {
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: pdfBase64,
               },
-              { text: EXTRACTION_PROMPT },
-            ],
-          },
-        ],
-        config: {
-          temperature: 0.1,
-          maxOutputTokens: 4000,
-          responseMimeType: "application/json",
+            },
+            { text: EXTRACTION_PROMPT },
+          ],
         },
-      });
-      text = result.text;
-      if (text) break;
-    } catch (err) {
-      lastError = err;
-      if (attempt < 1) {
-        await new Promise((r) => setTimeout(r, 2000));
-        continue;
-      }
-    }
+      ],
+      config: {
+        temperature: 0.1,
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json",
+      },
+    });
+    text = result.text;
+  } catch (err) {
+    lastError = err;
   }
 
   if (!text) {
