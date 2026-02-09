@@ -196,7 +196,7 @@ export default function TeamPage() {
   };
 
   const uniqueTracks = useMemo(
-    () => [...new Set(members.map((m) => m.track))].sort(),
+    () => Array.from(new Set(members.map((m) => m.track))).sort(),
     [members]
   );
 
