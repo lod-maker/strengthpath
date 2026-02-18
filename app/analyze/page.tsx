@@ -45,57 +45,78 @@ export default function AnalyzePage() {
     setIsGeneratingImage(false);
 
     try {
+      // Step 1: Extract strengths from PDF (fast text parser, ~1-2s)
       const formData = new FormData();
       formData.append("pdf", file);
-      formData.append("trackId", selectedTrack);
 
-      const response = await fetch("/api/analyze", {
+      const extractResponse = await fetch("/api/extract", {
         method: "POST",
         body: formData,
       });
 
-      let data;
+      let extractData;
       try {
-        data = await response.json();
+        extractData = await extractResponse.json();
       } catch {
-        // Server returned non-JSON (e.g. Vercel timeout or gateway error)
+        throw new Error("Failed to read the PDF. Please try again.");
+      }
+
+      if (!extractResponse.ok) {
+        throw new Error(extractData.error || "Failed to read the PDF. Please try again.");
+      }
+
+      // PDF processed — drop the File reference
+      setFile(null);
+
+      const extractedName = extractData.name || "Team Member";
+      const extractedStrengths = extractData.strengths;
+
+      // Step 2: Run AI analysis with gemini-3-pro-preview (~40-55s, own 60s budget)
+      const analyzeResponse = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          strengths: extractedStrengths,
+          name: extractedName,
+          trackId: selectedTrack,
+        }),
+      });
+
+      let analyzeData;
+      try {
+        analyzeData = await analyzeResponse.json();
+      } catch {
         throw new Error(
           "The analysis timed out or the server returned an unexpected response. Please try again."
         );
       }
 
-      if (!response.ok) {
-        throw new Error(data.error || "Analysis failed. Please try again.");
+      if (!analyzeResponse.ok) {
+        throw new Error(analyzeData.error || "Analysis failed. Please try again.");
       }
 
-      // PDF was sent and processed server-side — drop the File reference
-      setFile(null);
-
-      // Name is now extracted from PDF
-      const extractedName = data.name || "Team Member";
       setUserName(extractedName);
-
-      setStrengths(data.strengths);
-      setAnalysis(data.analysis);
+      setStrengths(extractedStrengths);
+      setAnalysis(analyzeData.analysis);
       setSessionResult({
         name: extractedName,
         track: selectedTrack,
-        extractedStrengths: data.strengths,
-        aiAnalysis: data.analysis,
+        extractedStrengths,
+        aiAnalysis: analyzeData.analysis,
         timestamp: new Date().toISOString(),
       });
       setStep("results");
 
       // Generate persona image in background
-      if (data.analysis?.persona) {
+      if (analyzeData.analysis?.persona) {
         setIsGeneratingImage(true);
         fetch("/api/generate-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            moniker: data.analysis.persona.moniker,
-            dominantDomain: data.analysis.persona.dominantDomain.name,
-            topFive: data.analysis.persona.topFive,
+            moniker: analyzeData.analysis.persona.moniker,
+            dominantDomain: analyzeData.analysis.persona.dominantDomain.name,
+            topFive: analyzeData.analysis.persona.topFive,
           }),
         })
           .then(async (res) => {
