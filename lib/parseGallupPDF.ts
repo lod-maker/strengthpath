@@ -41,22 +41,49 @@ function looksLikeName(candidate: string): boolean {
  * Gallup reports typically have the name near the top in various formats.
  */
 function extractNameFromText(text: string): string {
-  // Pattern 1: Look for "[Name]'s Signature Themes" or "[Name]'s Top 5"
+  // Pattern 1: "[Name]'s Signature Themes" or "[Name]'s Top 5"
   const signatureMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})'s\s+(?:Signature|Top|CliftonStrengths)/i);
   if (signatureMatch && looksLikeName(signatureMatch[1])) {
     return signatureMatch[1].trim();
   }
 
-  // Pattern 2: Look for name after "Report for" or "Prepared for"
+  // Pattern 2: "Report for" or "Prepared for" or "Results for"
   const reportForMatch = text.match(/(?:Report|Prepared|Results)\s+for\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
   if (reportForMatch && looksLikeName(reportForMatch[1])) {
     return reportForMatch[1].trim();
   }
 
-  // Pattern 3: Look for "[Name] | CliftonStrengths" (footer format)
-  const copyrightMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s+\|\s+CliftonStrengths/i);
-  if (copyrightMatch && looksLikeName(copyrightMatch[1])) {
-    return copyrightMatch[1].trim();
+  // Pattern 3: "[Name] | CliftonStrengths" (footer/header format)
+  const pipeMatch = text.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s+\|\s+CliftonStrengths/i);
+  if (pipeMatch && looksLikeName(pipeMatch[1])) {
+    return pipeMatch[1].trim();
+  }
+
+  // Pattern 4: "Name: John Smith" or "Candidate: John Smith"
+  const labelMatch = text.match(/(?:Name|Candidate|Participant|Employee)\s*:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
+  if (labelMatch && looksLikeName(labelMatch[1])) {
+    return labelMatch[1].trim();
+  }
+
+  // Pattern 5: ALL CAPS name (e.g. "JOHN SMITH") near the top
+  const capsMatch = text.match(/\b([A-Z]{2,}(?:\s+[A-Z]{2,}){1,3})\b/);
+  if (capsMatch) {
+    const candidate = capsMatch[1]
+      .split(/\s+/)
+      .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+      .join(" ");
+    if (looksLikeName(candidate)) return candidate;
+  }
+
+  // Pattern 6: First standalone proper-cased line in the first 600 chars
+  // (Modern Gallup PDFs often put the name as the very first text line)
+  const top = text.slice(0, 600);
+  const lines = top.split(/\n/).map((l) => l.trim()).filter(Boolean);
+  for (const line of lines.slice(0, 8)) {
+    // Must be 2-4 words, each starting with uppercase
+    if (/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}$/.test(line) && looksLikeName(line)) {
+      return line;
+    }
   }
 
   return "";
