@@ -167,12 +167,12 @@ export async function analyzeStrengths(
     );
   }
 
-  // Single attempt to avoid timeouts (Gemini-3-Pro can take ~50s)
+  // Single attempt — gemini-2.5-pro is GA and reliable (~15-25s)
   let text: string | undefined;
-  
+
   try {
     const result = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-2.5-pro",
       contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
       config: {
         temperature: 1,
