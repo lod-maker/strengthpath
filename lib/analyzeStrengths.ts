@@ -167,24 +167,36 @@ export async function analyzeStrengths(
     );
   }
 
-  // Single attempt — gemini-2.5-pro is GA and reliable (~15-25s)
+  // Primary: gemini-3-pro-preview. Fallback to gemini-2.5-flash on 503.
   let text: string | undefined;
 
-  try {
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
-      config: {
-        temperature: 1,
-        maxOutputTokens: 60000,
-        responseMimeType: "application/json",
-      },
-    });
-    
-    text = result.text;
-  } catch (err) {
-    console.error("Gemini API Analysis Error:", err);
-    throw err;
+  const models = ["gemini-3-pro-preview", "gemini-2.5-flash"];
+  for (const model of models) {
+    try {
+      const result = await ai.models.generateContent({
+        model,
+        contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
+        config: {
+          temperature: 1,
+          maxOutputTokens: 60000,
+          responseMimeType: "application/json",
+        },
+      });
+      text = result.text;
+      if (text) break;
+    } catch (err: unknown) {
+      const msg = String(err);
+      const isUnavailable =
+        msg.includes("503") ||
+        msg.includes("UNAVAILABLE") ||
+        msg.includes("high demand");
+      if (isUnavailable && model === "gemini-3-pro-preview") {
+        console.warn("gemini-3-pro-preview unavailable, falling back to gemini-2.5-flash");
+        continue;
+      }
+      console.error("Gemini API Analysis Error:", err);
+      throw err;
+    }
   }
 
   if (!text) {
