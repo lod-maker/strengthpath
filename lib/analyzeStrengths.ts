@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { ACCENTURE_ROLES, TRACKS } from "./accentureRoles";
+import { TRACKS } from "./accentureRoles";
 import { AnalysisResult, ExtractedStrengths, TrackId } from "./types";
 
 const SYSTEM_PROMPT = `Role: You are an expert CliftonStrengths Coach and Talent Development Executive who specializes in mapping talent DNA to technology consulting careers at Accenture. You combine deep knowledge of Gallup's 34 themes with real-world understanding of what each Accenture technology role actually demands day-to-day.
@@ -139,14 +139,8 @@ export async function analyzeStrengths(
   }
 
   const strengthsText = strengths
-    .map(function (s) {
-      return s.rank + ". " + s.name + (s.description ? ": " + s.description : "");
-    })
+    .map(function (s) { return s.rank + ". " + s.name; })
     .join("\n");
-
-  const rolesText = ACCENTURE_ROLES.map(function (r) {
-    return "- " + r.name + " [" + r.domain + "]: " + r.description;
-  }).join("\n");
 
   const userMessage = [
     "Candidate Name: " + name,
@@ -156,9 +150,6 @@ export async function analyzeStrengths(
     "",
     "My selected track: " + track.title,
     "Roles accessible from this track: " + track.accessibleRoles.join(", "),
-    "",
-    "All 28 roles for reference:",
-    rolesText,
   ].join("\n");
 
   if (userMessage.length > 50000) {
@@ -172,7 +163,7 @@ export async function analyzeStrengths(
   try {
     const response = await client.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 8000,
+      max_tokens: 4000,
       temperature: 0.7,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
