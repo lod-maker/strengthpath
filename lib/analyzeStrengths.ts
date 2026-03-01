@@ -105,7 +105,7 @@ Note: People CAN move between tracks over time. Flag strong fits outside the cur
 
 YOUR TASK
 
-Analyze this person's strengths against the roles above. Write as much as you need — be thorough, honest, and insightful. Every text field below is free-form: write full paragraphs, not bullet points or single sentences. Go deep. Return 9 perfectFitRoles, at least 4 cautionRoles, and 2-3 stretchRoles.
+Analyze this person's strengths against the roles above. Be concise and insightful — keep each text field to 2-3 sentences. Return 9 perfectFitRoles, at least 4 cautionRoles, and 2-3 stretchRoles.
 
 Respond ONLY in valid JSON matching this shape:
 
@@ -163,7 +163,7 @@ export async function analyzeStrengths(
   try {
     const response = await client.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 4000,
+      max_tokens: 8000,
       temperature: 0.7,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
