@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import Anthropic from "@anthropic-ai/sdk";
 import { ACCENTURE_ROLES, TRACKS } from "./accentureRoles";
 import { AnalysisResult, ExtractedStrengths, TrackId } from "./types";
 
@@ -124,14 +124,14 @@ export async function analyzeStrengths(
   trackId: TrackId,
   name: string
 ): Promise<AnalysisResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "Gemini API key is not configured. Please set GEMINI_API_KEY in your .env.local file."
+      "Anthropic API key is not configured. Please set ANTHROPIC_API_KEY in your .env.local file."
     );
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const client = new Anthropic({ apiKey });
 
   const track = TRACKS[trackId];
   if (!track) {
@@ -167,36 +167,21 @@ export async function analyzeStrengths(
     );
   }
 
-  // Primary: gemini-3-pro-preview. Fallback to gemini-2.5-flash on 503.
   let text: string | undefined;
 
-  const models = ["gemini-3-pro-preview", "gemini-2.5-flash"];
-  for (const model of models) {
-    try {
-      const result = await ai.models.generateContent({
-        model,
-        contents: SYSTEM_PROMPT + "\n\n---\n\n" + userMessage,
-        config: {
-          temperature: 0.7,
-          maxOutputTokens: 35000,
-          responseMimeType: "application/json",
-        },
-      });
-      text = result.text;
-      if (text) break;
-    } catch (err: unknown) {
-      const msg = String(err);
-      const isUnavailable =
-        msg.includes("503") ||
-        msg.includes("UNAVAILABLE") ||
-        msg.includes("high demand");
-      if (isUnavailable && model === "gemini-3-pro-preview") {
-        console.warn("gemini-3-pro-preview unavailable, falling back to gemini-2.5-flash");
-        continue;
-      }
-      console.error("Gemini API Analysis Error:", err);
-      throw err;
-    }
+  try {
+    const response = await client.messages.create({
+      model: "claude-opus-4-6",
+      max_tokens: 35000,
+      temperature: 0.7,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userMessage }],
+    });
+    const block = response.content[0];
+    text = block.type === "text" ? block.text : undefined;
+  } catch (err) {
+    console.error("Claude API Analysis Error:", err);
+    throw err;
   }
 
   if (!text) {
