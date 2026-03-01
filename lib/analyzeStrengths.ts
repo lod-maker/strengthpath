@@ -161,13 +161,14 @@ export async function analyzeStrengths(
   let text: string | undefined;
 
   try {
-    const response = await client.messages.create({
+    const stream = client.messages.stream({
       model: "claude-opus-4-6",
       max_tokens: 8000,
       temperature: 0.7,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
+    const response = await stream.finalMessage();
     const block = response.content[0];
     text = block.type === "text" ? block.text : undefined;
   } catch (err) {
