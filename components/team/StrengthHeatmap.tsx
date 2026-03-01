@@ -463,19 +463,21 @@ export default function StrengthHeatmap({ members, highlightMemberId, compareMod
                   className="px-0.5 text-center font-medium"
                   style={{ height: "80px", verticalAlign: "bottom" }}
                 >
-                  <div
-                    className="text-gray-400 whitespace-nowrap origin-bottom-left"
-                    style={{
-                      writingMode: "vertical-rl",
-                      transform: "rotate(180deg)",
-                      fontSize: "10px",
-                      lineHeight: "16px",
-                      maxHeight: "70px",
-                      overflow: "hidden",
-                    }}
-                    title={m.name}
-                  >
-                    {displayNames.get(m.id)}
+                  <div className="flex justify-center">
+                    <div
+                      className="text-gray-400 whitespace-nowrap"
+                      style={{
+                        writingMode: "vertical-rl",
+                        transform: "rotate(180deg)",
+                        fontSize: "10px",
+                        lineHeight: "16px",
+                        maxHeight: "70px",
+                        overflow: "hidden",
+                      }}
+                      title={m.name}
+                    >
+                      {displayNames.get(m.id)}
+                    </div>
                   </div>
                 </th>
               ))}
