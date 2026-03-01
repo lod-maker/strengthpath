@@ -172,7 +172,7 @@ export async function analyzeStrengths(
   try {
     const response = await client.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 35000,
+      max_tokens: 8000,
       temperature: 0.7,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
